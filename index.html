@@ -2736,7 +2736,7 @@
         callVoice.addEventListener("error", fallback, { once: true });
         var p = null; try { callVoice.currentTime = 0; p = callVoice.play(); } catch (e) { fallback(); }
         if (p && p.catch) p.catch(fallback);
-        setTimeout(function () { if (callLive && callVoice.readyState === 0 && !fell) fallback(); }, 5000);
+        setTimeout(function () { if (callLive && callVoice.readyState === 0 && callVoice.networkState !== 2 && !fell) fallback(); }, 10000);
       }
       $("callNo").addEventListener("click", callEnd);
       $("callYes").addEventListener("click", callAnswer);
