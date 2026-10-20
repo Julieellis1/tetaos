@@ -438,17 +438,18 @@ const NOTIFS = [
   {app:"System", icon:"\u2699", title:"Welcome to TetaOS", body:"Pull down for notifications. Top right corner opens Control Center.", time:"1h"}
 ];
 const PROJECTS = [
-  ["xylvar","SEO Agency","Landing and brand system for an SEO service for SMEs in the UK, US, Canada and Ireland."],
-  ["Movaldem Church Platform","Church","Website, app and quiz platform for a Lagos church, with daily verse and devotions."],
-  ["Marksheet","EdTech","Exams first school management platform: CBT, auto marking, results and report cards."],
-  ["Clinic Staff App","Health","Offline native staff app for Oluwatodupefun Maternity Home: attendance, patients, ANC."],
-  ["BellePal","Health","Nigeria first pregnancy companion with a West African clinical knowledge base."],
-  ["SAG Ministry","Ministry","Pitch prototype and site concept for a ministry launch."],
-  ["Esriltor","Services","Service business site with a clean lead focused layout."],
-  ["Premier HVAC","Trades","HVAC company site built around calls and quote requests."],
-  ["Bomorn Haven","Hospitality","Warm, image led site for a hospitality brand."],
-  ["ZoeSmile Dental","Dental","Dental clinic site with services and booking intent front and centre."],
-  ["Litmern Consults","Consulting","Consulting firm site with a sharp corporate voice."]
+  ["xylvar","SEO Agency","My product","SEO agency site with an opportunity report engine for local businesses."],
+  ["Movaldem","Church","Client work","Church platform with teaching library, daily Bible quiz and online giving."],
+  ["Esriltor","Estate Agency","Concept demo","Manchester estate agency site with listings, property pages and a sell journey."],
+  ["Premier HVAC","HVAC","Concept demo","Las Vegas HVAC company site with booking widget and service pages."],
+  ["Bomorn Haven","Restaurant","Concept demo","Restaurant site with tabbed menu, reservations, gallery and takeaway."],
+  ["ZoeSmile","Dental","Client work","Dental clinic platform with treatments, booking and patient information."],
+  ["Litmern Consults","Consulting","Concept demo","Consulting firm site with service pages, case studies and insights."],
+  ["SAG Ministry","Church","Client work","Church website with sermons, programs and online giving."],
+  ["Marksheet","EdTech","My product","School management platform with exams, results and parent app."],
+  ["VoltEdge","E-commerce","Concept demo","Electronics e-commerce demo with cart, checkout and 12 products."],
+  ["DollyTeens","Education","Concept demo","Kiddies college site with programmes, admissions, gallery and blog."],
+  ["Motiff","Architecture","Concept demo","Architecture and interiors studio template, 16 pages with cinematic motion design."]
 ];
 const APPS = [
   {id:"works", name:"Works", icon:"\u25C8", page:0, accented:true},
@@ -801,7 +802,7 @@ function appContent(id){
   const head = '<div class="app-head"><button class="back-btn" id="appBack" aria-label="Back to home screen"><b>&#8249;</b> Home</button><h2>' + a.name + '</h2><span class="micro">TetaOS 1.0</span></div><div class="app-body">';
   if (id === "works"){
     return head + PROJECTS.map(p =>
-      '<div class="proj"><b>' + p[0] + '</b><div class="tags"><i>' + p[1] + '</i><i>Live site</i></div><p>' + p[2] + '</p></div>').join("") + "</div>";
+      '<div class="proj"><b>' + p[0] + '</b><div class="tags"><i>' + p[1] + '</i><i>' + p[2] + '</i></div><p>' + p[3] + '</p></div>').join("") + "</div>";
   }
   if (id === "terminal"){
     return head + '<div class="term" id="termBox"><span id="termOut"></span><div><span class="tp">teta@teta-one:~$ </span><input id="termIn" autocomplete="off" spellcheck="false" aria-label="Terminal input"></div></div>' +
@@ -814,7 +815,7 @@ function appContent(id){
       '<div class="note-card"><b>Ideas that shipped</b><p>Marksheet, Movaldem platform, Clinic Staff App, BellePal, xylvar.</p></div></div>';
   }
   if (id === "files"){
-    return head + ["readme.txt","resume.pdf","Projects/ (11 project files)","Notes/ (3 notes)","Photos/","Wallpapers/","Trash/"].map(f =>
+    return head + ["readme.txt","resume.pdf","Projects/ (" + PROJECTS.length + " website files)","Notes/ (3 notes)","Photos/","Wallpapers/","Trash/"].map(f =>
       '<div class="note-card"><b>' + f + '</b></div>').join("") +
       '<p style="font-size:.78rem;color:var(--ink3)">Phase 0 note: this is the seeded filesystem view. Create, rename, move and the shared store with Terminal land in Phase 3.</p></div>';
   }
