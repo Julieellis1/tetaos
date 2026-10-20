@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>TetaOS 1.0: Phase 0 Prototype</title>
+<style>
+:root{
+  --bg:#050505; --panel:#0b0b0b; --panel2:#111111;
+  --ink:#f5f5f5; --ink2:#aaaaaa; --ink3:#8a8a8a;
+  --accent:#f9452d;
+  --hair:rgba(255,255,255,.07);
+  --glass:rgba(255,255,255,.045);
+  --spring-label:"SPRING 170 / 26";
+  --phone-w:min(410px,100vw);
+  --phone-h:min(880px,100dvh);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-weight:300; overflow:hidden; overscroll-behavior:none;
+}
+/* ---------- desktop stage ---------- */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:3.5rem}
+.stage-bg{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;overflow:hidden;
+}
+.stage-bg span{
+  font-size:19vw;font-weight:600;letter-spacing:-.02em;color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,.055);text-transform:uppercase;white-space:nowrap;
+}
+.stage-side{position:relative;z-index:2;width:270px;display:none}
+@media(min-width:1080px){.stage-side{display:block}}
+.micro{font-size:.68rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink3);font-weight:400}
+.stage-side h1{font-size:2rem;font-weight:200;line-height:1.15;margin:.8rem 0}
+.stage-side h1 b{font-weight:500}
+.stage-side p{font-size:.86rem;line-height:1.65;color:var(--ink2);font-weight:200}
+.stage-side ul{list-style:none;margin-top:1.1rem}
+.stage-side li{font-size:.82rem;color:var(--ink2);padding:.5rem 0;border-top:1px solid var(--hair);line-height:1.5}
+.stage-side li b{color:var(--ink);font-weight:400}
+.stat-row{display:flex;gap:1.6rem;margin-top:1.4rem}
+.stat-row div b{display:block;font-size:1.35rem;font-weight:300}
+.stat-row div i{font-style:normal;color:var(--accent);font-size:.9rem}
+.stat-row div span{font-size:.62rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink3)}
+.qrbox{margin-top:1.2rem;border:1px solid var(--hair);border-radius:12px;padding:.9rem;background:var(--glass)}
+.qrbox p{font-size:.75rem}
+/* ---------- phone frame ---------- */
+.phone-wrap{position:relative;z-index:3}
+.phone{
+  position:relative;width:var(--phone-w);height:var(--phone-h);
+  background:#000;border-radius:52px;padding:11px;
+  box-shadow:0 0 0 2px #1c1c1e,0 0 0 4px #333336,0 40px 90px rgba(0,0,0,.75);
+}
+@media(max-width:640px){
+  .phone{width:100vw;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+  .stage{gap:0}
+}
+.btn-side{position:absolute;background:#3a3a3c;border-radius:3px;cursor:pointer;border:none;padding:0}
+.btn-power{right:-5px;top:210px;width:4px;height:96px}
+.btn-vol1{left:-5px;top:180px;width:4px;height:56px}
+.btn-vol2{left:-5px;top:244px;width:4px;height:56px}
+@media(max-width:640px){.btn-side{display:none}}
+.screen{
+  position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;
+  background:#050505;touch-action:none;isolation:isolate;
+}
+@media(max-width:640px){.screen{border-radius:0}}
+.layer{position:absolute;inset:0}
+.hidden{display:none !important}
+/* wallpaper */
+.wallpaper{position:absolute;inset:-4%;background:
+  radial-gradient(120% 70% at 80% 0%,rgba(249,69,45,.16),transparent 55%),
+  radial-gradient(90% 60% at 10% 90%,rgba(255,255,255,.07),transparent 60%),
+  linear-gradient(165deg,#101014 0%,#050505 55%,#0a0a0c 100%);
+  transition:opacity .35s}
+.wallpaper.wp2{background:
+  radial-gradient(120% 70% at 15% 0%,rgba(255,255,255,.10),transparent 55%),
+  radial-gradient(80% 55% at 90% 95%,rgba(249,69,45,.22),transparent 60%),
+  linear-gradient(200deg,#0c0f14 0%,#050505 60%,#080808 100%)}
+.wallpaper.wp3{background:
+  radial-gradient(100% 60% at 50% 110%,rgba(249,69,45,.13),transparent 60%),
+  repeating-linear-gradient(115deg,rgba(255,255,255,.025) 0 1px,transparent 1px 90px),
+  linear-gradient(180deg,#070708,#050505)}
+.brightness-veil{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:90}
+.flashlight-veil{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:91}
+/* ---------- boot ---------- */
+#boot{background:#050505;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;cursor:pointer}
+#boot .wordmark{font-size:2.5rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase}
+#boot .wordmark i{font-style:normal;color:var(--accent)}
+#boot .bar{width:150px;height:2px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+#boot .bar div{height:100%;width:0%;background:var(--ink)}
+#boot .services{font-size:.62rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink3);min-height:1em;text-align:center}
+#boot .skip{position:absolute;bottom:2rem;font-size:.62rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink3)}
+/* ---------- status bar ---------- */
+.statusbar{
+  position:absolute;top:0;left:0;right:0;height:52px;z-index:55;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:15px 26px 0;pointer-events:none;
+  font-size:.86rem;font-weight:500;
+}
+.statusbar .sb-right{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--ink)}
+.sb-ico{width:17px;height:11px;display:inline-block}
+.capsule{
+  position:absolute;top:11px;left:50%;transform:translateX(-50%);
+  background:#000;border:1px solid var(--hair);border-radius:20px;
+  min-width:104px;height:30px;z-index:56;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:.66rem;letter-spacing:.08rem;text-transform:uppercase;color:var(--ink2);
+  padding:0 12px;pointer-events:none;
+}
+.capsule .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0}
+.capsule.live .dot{opacity:1;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+.homebar{
+  position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+  width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);z-index:58;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="stage-bg"><span>Teta OS</span></div>
+
+  <aside class="stage-side">
+    <div class="micro">Teta Digitals, Lagos</div>
+    <h1>A phone OS<br>that runs in<br><b>your browser.</b></h1>
+    <p>Phase 0 prototype. The shell, the springs and the gestures are real. Most apps are stubs. Feel it first, judge the apps later.</p>
+    <div class="stat-row">
+      <div><b>11<i>+</i></b><span>Sites live</span></div>
+      <div><b>3</b><span>Apps built</span></div>
+      <div><b>10</b><span>Industries</span></div>
+    </div>
+  </aside>
+
+  <div class="phone-wrap">
+    <div class="phone" id="phone">
+      <button class="btn-side btn-vol1" aria-label="Volume up"></button>
+      <button class="btn-side btn-vol2" aria-label="Volume down"></button>
+      <button class="btn-side btn-power" id="powerBtn" aria-label="Power"></button>
+      <div class="screen" id="screen">
+        <div class="wallpaper" id="wallpaper"></div>
+
+        <!-- BOOT -->
+        <div class="layer" id="boot">
+          <div class="wordmark">Teta<i>.</i></div>
+          <div class="bar"><div id="bootBar"></div></div>
+          <div class="services" id="bootSvc">Starting services</div>
+          <div class="skip">Tap to skip</div>
+        </div>
+
+        <!-- LOCK (injected by JS) -->
+        <div class="layer hidden" id="lock"></div>
+
+        <!-- HOME (injected by JS) -->
+        <div class="layer hidden" id="home"></div>
+
+        <!-- APP VIEW -->
+        <div class="layer hidden" id="appview"></div>
+
+        <!-- SWITCHER -->
+        <div class="layer hidden" id="switcher"></div>
+
+        <!-- SHADE + CONTROL CENTER -->
+        <div class="layer hidden" id="shade"></div>
+        <div class="layer hidden" id="cc"></div>
+
+        <div class="statusbar hidden" id="statusbar">
+          <div id="sbTime">9:41</div>
+          <div class="sb-right">
+            <span id="sbPlane" class="hidden">&#9992;</span>
+            <span id="sbBattTxt">100%</span>
+            <svg class="sb-ico" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="20" height="11" rx="3" fill="none" stroke="rgba(255,255,255,.4)"/><rect id="sbBattFill" x="2" y="2" width="17" height="8" rx="1.6" fill="#fff"/><path d="M23 4v4c.8-.3 1.3-1 1.3-2S23.8 4.3 23 4z" fill="rgba(255,255,255,.4)"/></svg>
+          </div>
+        </div>
+        <div class="capsule hidden" id="capsule"><span class="dot"></span><span id="capsuleTxt">TetaOS</span></div>
+        <div class="homebar hidden" id="homebar"></div>
+        <div class="brightness-veil" id="bveil"></div>
+        <div class="flashlight-veil" id="fveil"></div>
+        <div class="layer hidden" id="sleepveil" style="background:#000;z-index:95"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="stage-side">
+    <div class="micro">Try this, in order</div>
+    <ul>
+      <li><b>1.</b> Swipe up on the lock screen. It follows your finger.</li>
+      <li><b>2.</b> Open Works. Then swipe up from the bottom edge to go home. The app shrinks back into its icon.</li>
+      <li><b>3.</b> Swipe up and <b>hold</b> in an app for the switcher. Fling a card up to kill it.</li>
+      <li><b>4.</b> Drag down from the top for notifications. Top right corner for Control Center.</li>
+      <li><b>5.</b> Grab any moving surface mid flight. Everything is interruptible.</li>
+      <li><b>6.</b> Open Terminal, type <b>teta-fetch</b>. Open Settings to watch the live FPS meter.</li>
+    </ul>
+    <div class="qrbox"><p>On desktop, test mouse drags here first. The real gate is on your phone: open this file or its hosted copy in mobile Chrome and Safari and run the same six steps.</p></div>
+  </aside>
+</div>
+<style>
+/* ---------- lock ---------- */
+#lock{z-index:40;display:flex;flex-direction:column;padding:74px 22px 30px;will-change:transform;cursor:grab}
+#lock .lock-top{text-align:center;margin-top:1.2rem}
+#lock .lock-clock{font-size:5.2rem;font-weight:200;letter-spacing:-.03em;line-height:1}
+#lock .lock-date{font-size:1rem;color:var(--ink);font-weight:300;margin-bottom:.4rem}
+#lock .teta-id{font-size:.62rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2);margin-top:.7rem}
+.notif-stack{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.notif{
+  background:rgba(30,30,32,.55);backdrop-filter:blur(18px);border:1px solid var(--hair);
+  border-radius:20px;padding:11px 14px;display:flex;gap:10px;align-items:flex-start;
+}
+.notif .n-ico{width:34px;height:34px;border-radius:9px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none}
+.notif b{font-size:.82rem;font-weight:500;display:block}
+.notif p{font-size:.78rem;color:#d8d8d8;line-height:1.4;font-weight:200}
+.notif time{margin-left:auto;font-size:.66rem;color:var(--ink3);flex:none}
+.lock-shortcuts{display:flex;justify-content:space-between;margin-top:16px;padding:0 14px}
+.lock-shortcuts button{
+  width:48px;height:48px;border-radius:50%;border:1px solid var(--hair);
+  background:rgba(30,30,32,.55);color:var(--ink);font-size:1.05rem;cursor:pointer;
+}
+.lock-hint{text-align:center;margin-top:14px;font-size:.66rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2)}
+/* ---------- home ---------- */
+#home{z-index:20;display:flex;flex-direction:column;padding:64px 18px 96px;will-change:transform}
+.widgets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.widget{
+  background:var(--glass);border:1px solid var(--hair);border-radius:22px;
+  backdrop-filter:blur(14px);padding:13px 15px;min-height:86px;cursor:pointer;text-align:left;color:var(--ink);font-family:inherit;
+}
+.widget .w-clock{font-size:1.9rem;font-weight:200;line-height:1}
+.widget .w-sub{font-size:.66rem;letter-spacing:.1rem;text-transform:uppercase;color:var(--ink2);margin-top:5px}
+.widget.wide{grid-column:span 2;min-height:64px;display:flex;align-items:center;gap:10px}
+.pill-avail{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:400}
+.pill-avail .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84;animation:pulse 1.8s infinite}
+.batt-ring{width:52px;height:52px;flex:none}
+.pages-viewport{flex:1;overflow:hidden;position:relative}
+.pages{display:flex;height:100%;will-change:transform}
+.page{flex:0 0 100%;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:min-content;gap:20px 8px;padding:4px 2px;align-content:start}
+.appicon{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;color:var(--ink);font-family:inherit}
+.appicon .ico{
+  width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,#232327,#121214);
+  border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;
+  font-size:1.45rem;will-change:transform;
+}
+.appicon .ico.accented{background:linear-gradient(160deg,#2a1512,#160c0a);border-color:rgba(249,69,45,.35)}
+.appicon span{font-size:.64rem;font-weight:400;color:var(--ink);text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.dots{display:flex;gap:7px;justify-content:center;margin-top:10px}
+.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.32)}
+.dots i.on{background:#fff}
+.dock{
+  position:absolute;left:14px;right:14px;bottom:16px;z-index:25;
+  background:rgba(28,28,30,.5);backdrop-filter:blur(22px);border:1px solid var(--hair);
+  border-radius:30px;padding:11px 16px;display:flex;justify-content:space-between;
+}
+.dock .appicon span{display:none}
+.dock .appicon .ico{width:58px;height:58px}
+/* ---------- shade / cc ---------- */
+#shade,#cc{z-index:70;background:rgba(10,10,12,.45);backdrop-filter:blur(26px);padding:64px 18px 24px;will-change:transform;overflow-y:auto}
+#shade h3,#cc h3{font-size:.68rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2);margin:6px 2px 12px;font-weight:400}
+#shade .notif{margin-bottom:8px;cursor:pointer}
+.clearall{width:100%;margin-top:6px;background:var(--glass);border:1px solid var(--hair);color:var(--ink);border-radius:14px;padding:11px;font-family:inherit;font-size:.8rem;cursor:pointer}
+.cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cc-tile{
+  border-radius:22px;border:1px solid var(--hair);background:rgba(255,255,255,.05);
+  padding:15px;display:flex;flex-direction:column;gap:7px;cursor:pointer;color:var(--ink);font-family:inherit;text-align:left;min-height:92px;
+}
+.cc-tile .t-ico{width:38px;height:38px;border-radius:50%;background:#3a3a3c;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.cc-tile.on .t-ico{background:var(--accent)}
+.cc-tile b{font-size:.82rem;font-weight:500}
+.cc-tile small{font-size:.68rem;color:var(--ink2)}
+.cc-slider{grid-column:span 2;background:rgba(255,255,255,.05);border:1px solid var(--hair);border-radius:22px;padding:15px}
+.cc-slider label{font-size:.68rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2);display:block;margin-bottom:10px}
+.cc-slider input{width:100%;accent-color:var(--accent)}
+/* ---------- app view ---------- */
+#appview{z-index:30;background:var(--panel);will-change:transform,border-radius;overflow:hidden;display:flex;flex-direction:column}
+.app-head{
+  padding:60px 20px 12px;display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--hair);flex:none;
+}
+.app-head h2{font-size:1.35rem;font-weight:300}
+.app-head .micro{margin-left:auto}
+.app-body{flex:1;overflow-y:auto;padding:16px 20px 40px;touch-action:pan-y}
+.app-body::-webkit-scrollbar{width:0}
+.proj{border:1px solid var(--hair);border-radius:16px;padding:15px;margin-bottom:11px;background:var(--glass)}
+.proj b{font-weight:500;font-size:.95rem}
+.proj .tags{margin:7px 0;display:flex;gap:6px;flex-wrap:wrap}
+.proj .tags i{font-style:normal;font-size:.62rem;letter-spacing:.08rem;text-transform:uppercase;border:1px solid var(--hair);border-radius:20px;padding:3px 9px;color:var(--ink2)}
+.proj p{font-size:.82rem;color:var(--ink2);line-height:1.55;font-weight:200}
+.term{background:#000;border-radius:14px;border:1px solid var(--hair);padding:14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.76rem;line-height:1.65;min-height:300px;white-space:pre-wrap;word-break:break-word}
+.term .tp{color:var(--accent)}
+.term input{background:none;border:none;outline:none;color:var(--ink);font:inherit;width:70%}
+.note-card{border:1px solid var(--hair);border-radius:16px;padding:15px;background:var(--glass);margin-bottom:11px}
+.note-card b{font-weight:500;font-size:.92rem}
+.note-card p{font-size:.82rem;color:var(--ink2);line-height:1.55;margin-top:5px;font-weight:200}
+.set-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--hair);padding:14px 2px;font-size:.88rem}
+.set-row small{display:block;color:var(--ink3);font-size:.7rem;margin-top:3px;font-weight:200}
+.switch{width:50px;height:30px;border-radius:20px;background:#3a3a3c;border:none;position:relative;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .2s}
+.switch.on{background:#34c759}
+.switch.on::after{left:22px}
+.wp-pick{display:flex;gap:9px}
+.wp-pick button{width:44px;height:44px;border-radius:12px;border:2px solid transparent;cursor:pointer}
+.wp-pick button.sel{border-color:var(--accent)}
+.fps-big{font-size:2rem;font-weight:200}
+.generic p{font-size:.88rem;color:var(--ink2);line-height:1.65;font-weight:200;margin-bottom:.8rem}
+/* ---------- switcher ---------- */
+#switcher{z-index:65;background:rgba(5,5,5,.55);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:70px 0 30px}
+#switcher h3{text-align:center;font-size:.68rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2);font-weight:400;margin-bottom:16px}
+.sw-track{flex:1;display:flex;gap:16px;overflow-x:auto;padding:6px 40px;scroll-snap-type:x mandatory;align-items:flex-start}
+.sw-track::-webkit-scrollbar{display:none}
+.sw-card{
+  flex:0 0 68%;height:78%;border-radius:30px;background:var(--panel2);
+  border:1px solid var(--hair);scroll-snap-align:center;padding:20px;cursor:grab;will-change:transform;
+  display:flex;flex-direction:column;
+}
+.sw-card .sw-ico{font-size:2rem;margin-bottom:10px}
+.sw-card b{font-weight:400;font-size:1.05rem}
+.sw-card p{font-size:.8rem;color:var(--ink3);line-height:1.5;margin-top:6px;font-weight:200}
+.sw-card .sw-tag{margin-top:auto}
+</style>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const screenEl = $("screen"), wallpaperEl = $("wallpaper");
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ============ SPRING CORE (single config for the whole OS) ============ */
+const SPRING_CFG = { stiffness: 170, damping: 26, mass: 1 };
+const springs = new Set();
+let lastT = performance.now(), fpsFrames = 0, fpsVal = 0;
+class Spring {
+  constructor(x, onUpdate, cfg){
+    this.x = x; this.v = 0; this.target = x;
+    this.cfg = cfg || SPRING_CFG;
+    this.onUpdate = onUpdate; this.onSettle = null;
+    this.active = true; springs.add(this);
+  }
+  setTarget(t, vel){
+    if (typeof vel === "number") this.v = vel;
+    this.target = t; this.active = true;
+  }
+  grab(){ this.active = false; }
+  step(dt){
+    if (!this.active) return;
+    if (S.reduceMotion){ this.x = this.target; this.v = 0; this.active = false; this.onUpdate(this.x); return; }
+    const k = this.cfg.stiffness, c = this.cfg.damping, m = this.cfg.mass;
+    const f = -k * (this.x - this.target) - c * this.v;
+    this.v += (f / m) * dt;
+    this.x += this.v * dt;
+    if (Math.abs(this.v) < 4 && Math.abs(this.x - this.target) < 0.6){
+      this.x = this.target; this.v = 0; this.active = false;
+      this.onUpdate(this.x);
+      if (this.onSettle){ const cb = this.onSettle; this.onSettle = null; cb(); }
+      return;
+    }
+    this.onUpdate(this.x);
+  }
+}
+function rafLoop(now){
+  const dt = clamp((now - lastT) / 1000, 0.001, 0.033); lastT = now;
+  fpsFrames++;
+  if (now - (rafLoop.lastFpsT || 0) > 500){
+    fpsVal = Math.round(fpsFrames * 1000 / (now - (rafLoop.lastFpsT || now)));
+    fpsFrames = 0; rafLoop.lastFpsT = now;
+    document.querySelectorAll(".fps-val").forEach(e => e.textContent = fpsVal);
+  }
+  springs.forEach(s => s.step(dt));
+  requestAnimationFrame(rafLoop);
+}
+requestAnimationFrame(rafLoop);
+
+/* ============ STATE ============ */
+const S = {
+  booted:false, locked:true, sleeping:false,
+  currentApp:null, openApps:[], page:0,
+  airplane:false, dnd:false, muted:false, flashlight:false, light:false,
+  brightness:0.85, volume:0.7, reduceMotion:false,
+  suppressClickUntil:0, batteryReal:false
+};
+const NOTIFS = [
+  {app:"Works", icon:"\u25C8", title:"Movaldem Church Platform is live", body:"Church platform shipped by Teta Digitals.", time:"now"},
+  {app:"Marksheet", icon:"\u2713", title:"Deployment shipped", body:"Latest Marksheet build deployed successfully.", time:"12m"},
+  {app:"Contact (Demo)", icon:"\u2709", title:"New enquiry opened: Demo", body:"Demo item. This is sample content, not a real client message.", time:"31m"},
+  {app:"Notes", icon:"\u270E", title:"Pinned: Process", body:"Discover, Design, Build, Ship.", time:"1h"},
+  {app:"System", icon:"\u2699", title:"Welcome to TetaOS", body:"Pull down for notifications. Top right corner opens Control Center.", time:"1h"}
+];
+const PROJECTS = [
+  ["xylvar","SEO Agency","Landing and brand system for an SEO service for SMEs in the UK, US, Canada and Ireland."],
+  ["Movaldem Church Platform","Church","Website, app and quiz platform for a Lagos church, with daily verse and devotions."],
+  ["Marksheet","EdTech","Exams first school management platform: CBT, auto marking, results and report cards."],
+  ["Clinic Staff App","Health","Offline native staff app for Oluwatodupefun Maternity Home: attendance, patients, ANC."],
+  ["BellePal","Health","Nigeria first pregnancy companion with a West African clinical knowledge base."],
+  ["SAG Ministry","Ministry","Pitch prototype and site concept for a ministry launch."],
+  ["Esriltor","Services","Service business site with a clean lead focused layout."],
+  ["Premier HVAC","Trades","HVAC company site built around calls and quote requests."],
+  ["Bomorn Haven","Hospitality","Warm, image led site for a hospitality brand."],
+  ["ZoeSmile Dental","Dental","Dental clinic site with services and booking intent front and centre."],
+  ["Litmern Consults","Consulting","Consulting firm site with a sharp corporate voice."]
+];
+const APPS = [
+  {id:"works", name:"Works", icon:"\u25C8", page:0, accented:true},
+  {id:"notes", name:"Notes", icon:"\u270E", page:0},
+  {id:"files", name:"Files", icon:"\uD83D\uDDC0", page:0},
+  {id:"terminal", name:"Terminal", icon:"&gt;_", page:0, accented:true},
+  {id:"photos", name:"Photos", icon:"\u25A3", page:0},
+  {id:"camera", name:"Camera", icon:"\u25CE", page:0},
+  {id:"clock", name:"Clock", icon:"\u25D0", page:0},
+  {id:"settings", name:"Settings", icon:"\u2699", page:0},
+  {id:"music", name:"Music", icon:"\u266A", page:1},
+  {id:"weather", name:"Weather", icon:"\u2601", page:1},
+  {id:"calendar", name:"Calendar", icon:"\u25A4", page:1},
+  {id:"calculator", name:"Calculator", icon:"=", page:1},
+  {id:"contact", name:"Contact", icon:"\u2709", page:1, accented:true}
+];
+const DOCK = ["works","terminal","camera","contact"];
+const appById = id => APPS.find(a => a.id === id);
+
+/* ============ SOUND (Web Audio, generated, no files) ============ */
+let actx = null;
+function blip(freq, dur, type){
+  if (S.muted) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || "sine"; o.frequency.value = freq || 660;
+    g.gain.value = 0.06 * S.volume;
+    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + (dur || 0.07));
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + (dur || 0.07));
+  }catch(e){}
+}
+function haptic(ms){ try{ if (navigator.vibrate) navigator.vibrate(ms || 8); }catch(e){} }
+
+/* ============ CLOCK + BATTERY ============ */
+function tickClock(){
+  const d = new Date();
+  const t = d.getHours() % 12 === 0 ? 12 : d.getHours() % 12;
+  const time = t + ":" + String(d.getMinutes()).padStart(2,"0");
+  $("sbTime").textContent = time;
+  const lc = $("lockClock"); if (lc) lc.textContent = time;
+  const ld = $("lockDate");
+  if (ld) ld.textContent = d.toLocaleDateString("en-GB",{weekday:"long", day:"numeric", month:"long"});
+  const wc = $("widgetClock"); if (wc) wc.textContent = time;
+  const wd = $("widgetDate");
+  if (wd) wd.textContent = d.toLocaleDateString("en-GB",{weekday:"short", day:"numeric", month:"short"}) + ", Lagos";
+}
+setInterval(tickClock, 1000);
+if (navigator.getBattery){
+  navigator.getBattery().then(b => {
+    S.batteryReal = true;
+    const upd = () => {
+      const pct = Math.round(b.level * 100);
+      $("sbBattTxt").textContent = pct + "%";
+      $("sbBattFill").setAttribute("width", Math.round(17 * b.level));
+      const bw = $("widgetBatt"); if (bw) bw.textContent = pct + "%" + (b.charging ? ", charging" : "");
+      const br = $("battRingFg");
+      if (br) br.style.strokeDashoffset = String(2 * Math.PI * 22 * (1 - b.level));
+    };
+    b.addEventListener("levelchange", upd); b.addEventListener("chargingchange", upd); upd();
+  }).catch(()=>{});
+}
+if (!navigator.getBattery){
+  $("sbBattTxt").style.display = "none";
+  document.querySelector(".sb-ico").style.display = "none";
+}
+
+/* ============ RENDER: LOCK ============ */
+function renderLock(){
+  const el = $("lock");
+  el.innerHTML =
+    '<div class="lock-top">' +
+      '<div class="lock-date" id="lockDate"></div>' +
+      '<div class="lock-clock" id="lockClock">9:41</div>' +
+      '<div class="teta-id">Teta ID, tap or swipe up</div>' +
+    '</div>' +
+    '<div class="notif-stack">' +
+      NOTIFS.slice(0,3).map(n =>
+        '<div class="notif"><div class="n-ico">' + n.icon + '</div><div><b>' + n.title + '</b><p>' + n.body + '</p></div><time>' + n.time + '</time></div>'
+      ).join("") +
+    '</div>' +
+    '<div class="lock-shortcuts">' +
+      '<button id="lockFlash" aria-label="Flashlight">\uD83D\uDD26</button>' +
+      '<button id="lockCam" aria-label="Camera">\u25CE</button>' +
+    '</div>' +
+    '<div class="lock-hint">Swipe up to open</div>';
+  tickClock();
+  $("lockFlash").addEventListener("click", e => { e.stopPropagation(); toggleFlash(); });
+  $("lockCam").addEventListener("click", e => { e.stopPropagation(); unlock(() => openApp("camera")); });
+}
+
+/* ============ RENDER: HOME ============ */
+function iconHTML(a, extra){
+  return '<button class="appicon" data-app="' + a.id + '" ' + (extra||"") + '>' +
+    '<div class="ico' + (a.accented ? " accented" : "") + '">' + a.icon + '</div><span>' + a.name + '</span></button>';
+}
+function renderHome(){
+  const el = $("home");
+  const pageApps = p => APPS.filter(a => a.page === p).map(a => iconHTML(a)).join("");
+  el.innerHTML =
+    '<div class="widgets">' +
+      '<button class="widget" id="wClock"><div class="w-clock" id="widgetClock">9:41</div><div class="w-sub" id="widgetDate">Lagos</div></button>' +
+      '<div class="widget"><svg class="batt-ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="battRingFg" cx="26" cy="26" r="22" fill="none" stroke="#f9452d" stroke-width="4" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="30" transform="rotate(-90 26 26)"/></svg><div class="w-sub" id="widgetBatt">Battery</div></div>' +
+      '<button class="widget wide" id="wAvail"><span class="pill-avail"><span class="dot"></span>Available for projects</span><span class="w-sub" style="margin:0 0 0 auto">Tap: Contact</span></button>' +
+    '</div>' +
+    '<div class="pages-viewport" id="pagesVp"><div class="pages" id="pages">' +
+      '<div class="page">' + pageApps(0) + '</div><div class="page">' + pageApps(1) + '</div>' +
+    '</div></div>' +
+    '<div class="dots" id="pageDots"><i class="on"></i><i></i></div>' +
+    '<div class="dock">' + DOCK.map(id => iconHTML(appById(id))).join("") + '</div>';
+  tickClock();
+  el.querySelectorAll(".appicon").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (Date.now() < S.suppressClickUntil) return;
+      openApp(btn.dataset.app, btn.querySelector(".ico"));
+    });
+  });
+  $("wAvail").addEventListener("click", () => { if (Date.now() < S.suppressClickUntil) return; openApp("contact"); });
+  $("wClock").addEventListener("click", () => { if (Date.now() < S.suppressClickUntil) return; openApp("clock"); });
+  setupPaging();
+}
+
+/* ============ RENDER: SHADE + CC ============ */
+function renderShade(){
+  $("shade").innerHTML = "<h3>Notifications</h3>" +
+    (NOTIFS.length ? NOTIFS.map((n,i) =>
+      '<div class="notif" data-napp="' + n.app + '"><div class="n-ico">' + n.icon + '</div><div><b>' + n.title + '</b><p>' + n.body + '</p></div><time>' + n.time + '</time></div>').join("")
+      : '<p style="color:var(--ink3);font-size:.85rem;padding:8px 2px">No notifications. You are all caught up.</p>') +
+    '<button class="clearall" id="clearAll">Clear all</button>';
+  const ca = $("clearAll");
+  if (ca) ca.addEventListener("click", () => { NOTIFS.length = 0; renderShade(); renderLock(); blip(520,.06); });
+  $("shade").querySelectorAll(".notif").forEach(n => n.addEventListener("click", () => {
+    closeTopLayers();
+    const map = {"Works":"works","Marksheet":"works","Contact (Demo)":"contact","Notes":"notes","System":"settings"};
+    openApp(map[n.dataset.napp] || "works");
+  }));
+}
+function renderCC(){
+  const tile = (id, ico, label, sub, on) =>
+    '<button class="cc-tile' + (on ? " on" : "") + '" id="cc-' + id + '"><span class="t-ico">' + ico + '</span><b>' + label + '</b><small>' + sub + '</small></button>';
+  $("cc").innerHTML = "<h3>Control Center</h3><div class='cc-grid'>" +
+    tile("plane","\u2708","Airplane Mode", S.airplane ? "On" : "Off", S.airplane) +
+    tile("dnd","\u263E","Do Not Disturb", S.dnd ? "On" : "Off", S.dnd) +
+    tile("flash","\uD83D\uDD26","Flashlight", S.flashlight ? "On" : "Off", S.flashlight) +
+    tile("mute","\uD83D\uDD07","Mute", S.muted ? "Muted" : "Sounds on", S.muted) +
+    tile("theme","\u25D0","Light Theme", S.light ? "On" : "Off", S.light) +
+    tile("sleep","\u23FB","Sleep","Lock the device", false) +
+    '<div class="cc-slider"><label>Brightness</label><input type="range" id="ccBright" min="30" max="100" value="' + Math.round(S.brightness*100) + '"></div>' +
+    '<div class="cc-slider"><label>Volume</label><input type="range" id="ccVol" min="0" max="100" value="' + Math.round(S.volume*100) + '"></div>' +
+    "</div>";
+  const bind = (id, fn) => { const e = $("cc-" + id); if (e) e.addEventListener("click", fn); };
+  bind("plane", () => { S.airplane = !S.airplane; $("sbPlane").classList.toggle("hidden", !S.airplane); setCapsule(S.airplane ? "Airplane mode" : "TetaOS", S.airplane); renderCC(); blip(S.airplane?440:660,.06); });
+  bind("dnd", () => { S.dnd = !S.dnd; renderCC(); });
+  bind("flash", () => { toggleFlash(); renderCC(); });
+  bind("mute", () => { S.muted = !S.muted; renderCC(); if (!S.muted) blip(700,.06); });
+  bind("theme", () => { S.light = !S.light; screenEl.classList.toggle("light", S.light); renderCC(); });
+  bind("sleep", () => { closeTopLayers(); sleepDevice(); });
+  $("ccBright").addEventListener("input", e => { S.brightness = e.target.value / 100; $("bveil").style.opacity = String((1 - S.brightness) * 0.8); });
+  $("ccVol").addEventListener("input", e => { S.volume = e.target.value / 100; });
+}
+function toggleFlash(){
+  S.flashlight = !S.flashlight;
+  $("fveil").style.opacity = S.flashlight ? "1" : "0";
+  $("fveil").style.pointerEvents = S.flashlight ? "auto" : "none";
+  if (S.flashlight) $("fveil").onclick = () => toggleFlash();
+}
+function setCapsule(text, live){
+  $("capsuleTxt").textContent = text;
+  $("capsule").classList.toggle("live", !!live);
+}
+
+/* light theme overrides, scoped to the phone screen */
+(function(){
+  const st = document.createElement("style");
+  st.textContent =
+    "#screen.light{--panel:#ededf1;--panel2:#ffffff;--ink:#141416;--ink2:#55555e;--ink3:#83838c;--glass:rgba(0,0,0,.045);--hair:rgba(0,0,0,.10)}" +
+    "#screen.light .wallpaper{filter:brightness(1.9) saturate(.55)}" +
+    "#screen.light .notif{background:rgba(255,255,255,.65)}" +
+    "#screen.light .notif p{color:#333}" +
+    "#screen.light .appicon span{color:#141416;text-shadow:none}" +
+    "#screen.light .statusbar{color:#141416}" +
+    "#screen.light .term{background:#0a0a0a;color:#f5f5f5}";
+  document.head.appendChild(st);
+})();
+</script>
+<script>
+"use strict";
+const H = () => screenEl.clientHeight, W = () => screenEl.clientWidth;
+const screenRect = () => screenEl.getBoundingClientRect();
+
+/* ============ SURFACE SPRINGS ============ */
+let lockSpring, shadeSpring, ccSpring, appSpring, pageSpring;
+let appIconSnap = null;
+
+function initSprings(){
+  lockSpring = new Spring(0, y => { $("lock").style.transform = "translateY(" + y + "px)"; });
+  const mkTop = id => new Spring(0, p => {
+    $(id).style.transform = "translateY(" + (-(1 - p) * (H() + 20)) + "px)";
+  });
+  shadeSpring = mkTop("shade"); ccSpring = mkTop("cc");
+  shadeSpring.x = 0; ccSpring.x = 0;
+  appSpring = new Spring(0, p => renderAppTransform(p));
+  pageSpring = new Spring(0, x => { const pg = $("pages"); if (pg) pg.style.transform = "translateX(" + x + "px)"; });
+}
+function renderAppTransform(p){
+  const el = $("appview");
+  if (!appIconSnap){ el.style.transform = "scale(" + (0.9 + 0.1 * p) + ")"; el.style.opacity = String(p); return; }
+  const r = screenRect();
+  const tx = (appIconSnap.cx - r.width / 2) * (1 - p);
+  const ty = (appIconSnap.cy - r.height / 2) * (1 - p);
+  const sc = appIconSnap.w / r.width + (1 - appIconSnap.w / r.width) * p;
+  el.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + sc + ")";
+  el.style.borderRadius = ((1 - p) * 30) + "px";
+  el.style.opacity = String(0.35 + 0.65 * p);
+}
+function snapFromIcon(iconEl, appId){
+  const r = screenRect();
+  let el = iconEl;
+  if (!el){
+    const found = document.querySelector('.appicon[data-app="' + appId + '"] .ico');
+    if (found) el = found;
+  }
+  if (!el) return { cx: r.width / 2, cy: r.height / 2, w: 60 };
+  const b = el.getBoundingClientRect();
+  return { cx: b.left - r.left + b.width / 2, cy: b.top - r.top + b.height / 2, w: b.width };
+}
+
+/* ============ LOCK / UNLOCK / SLEEP ============ */
+function unlock(after){
+  if (!S.locked) { if (after) after(); return; }
+  $("home").classList.remove("hidden");
+  blip(740, .08); haptic(12);
+  lockSpring.onSettle = () => {
+    $("lock").classList.add("hidden"); S.locked = false;
+    setCapsule("TetaOS", false);
+    if (after) after();
+  };
+  lockSpring.setTarget(-(H() + 30), -300);
+}
+function lockDevice(){
+  S.locked = true;
+  renderLock();
+  const el = $("lock");
+  el.classList.remove("hidden");
+  lockSpring.x = -(H() + 30); lockSpring.v = 0; lockSpring.active = false;
+  lockSpring.onUpdate(lockSpring.x);
+  lockSpring.onSettle = () => { if (!S.currentApp) $("home").classList.add("hidden"); };
+  lockSpring.setTarget(0);
+  setCapsule("Locked", false);
+}
+function sleepDevice(){
+  S.sleeping = true; $("sleepveil").classList.remove("hidden"); blip(320,.09);
+}
+function wakeDevice(){
+  S.sleeping = false; $("sleepveil").classList.add("hidden");
+  if (!S.locked) lockDevice();
+  blip(560,.07);
+}
+$("powerBtn").addEventListener("click", () => { S.sleeping ? wakeDevice() : sleepDevice(); });
+$("sleepveil").addEventListener("click", () => wakeDevice());
+
+/* ============ TOP LAYERS: SHADE + CONTROL CENTER ============ */
+let topOpen = null;
+function openTop(which){
+  renderShade(); renderCC();
+  const el = $(which), spr = which === "shade" ? shadeSpring : ccSpring;
+  el.classList.remove("hidden");
+  spr.x = 0; spr.onUpdate(0);
+  topOpen = which;
+  spr.setTarget(1);
+  blip(600,.05);
+}
+function closeTopLayers(){
+  if (!topOpen) return;
+  const spr = topOpen === "shade" ? shadeSpring : ccSpring, el = $(topOpen);
+  topOpen = null;
+  spr.onSettle = () => el.classList.add("hidden");
+  spr.setTarget(0);
+}
+
+/* ============ APP MANAGER ============ */
+function openApp(id, iconEl){
+  const app = appById(id); if (!app) return;
+  if (S.locked){ unlock(() => openApp(id, iconEl)); return; }
+  closeTopLayers(); closeSwitcher();
+  S.currentApp = id;
+  if (!S.openApps.includes(id)) S.openApps.push(id);
+  appIconSnap = snapFromIcon(iconEl, id);
+  const view = $("appview");
+  view.innerHTML = appContent(id);
+  attachApp(id);
+  view.classList.remove("hidden");
+  appSpring.x = 0; appSpring.onUpdate(0);
+  appSpring.setTarget(1);
+  setCapsule(app.name, id === "terminal");
+  blip(680,.05); haptic(8);
+}
+function closeApp(){
+  if (!S.currentApp) return;
+  const id = S.currentApp; S.currentApp = null;
+  appIconSnap = snapFromIcon(null, id);
+  appSpring.onSettle = () => { $("appview").classList.add("hidden"); if (!S.locked) $("home").classList.remove("hidden"); setCapsule("TetaOS", false); };
+  appSpring.setTarget(0);
+  blip(480,.05);
+}
+function terminateApp(id){
+  S.openApps = S.openApps.filter(a => a !== id);
+  if (S.currentApp === id){
+    S.currentApp = null;
+    $("appview").classList.add("hidden");
+    setCapsule("TetaOS", false);
+  }
+  haptic(14); blip(300,.07);
+}
+/* switcher */
+function openSwitcher(){
+  if (!S.openApps.length && !S.currentApp) return;
+  const ids = S.openApps.length ? S.openApps : [S.currentApp];
+  const sw = $("switcher");
+  sw.innerHTML = "<h3>App Switcher: tap a card, fling up to close</h3><div class='sw-track'>" +
+    ids.map(id => { const a = appById(id); return '<div class="sw-card" data-sw="' + id + '"><div class="sw-ico">' + a.icon + '</div><b>' + a.name + '</b><p>' + (id === S.currentApp ? "Running now. State is preserved while suspended." : "Suspended. State is preserved.") + '</p><div class="sw-tag micro">TetaOS app</div></div>'; }).join("") +
+    "</div>";
+  sw.classList.remove("hidden");
+  sw.querySelectorAll(".sw-card").forEach(card => attachCardGestures(card));
+  setCapsule("Switcher", true);
+}
+function closeSwitcher(){
+  if ($("switcher").classList.contains("hidden")) return;
+  $("switcher").classList.add("hidden");
+  setCapsule(S.currentApp ? appById(S.currentApp).name : "TetaOS", false);
+}
+$("switcher").addEventListener("click", e => { if (e.target.id === "switcher") closeSwitcher(); });
+function attachCardGestures(card){
+  let sy = 0, dy = 0, dragging = false;
+  card.addEventListener("pointerdown", e => { sy = e.clientY; dy = 0; dragging = true; card.setPointerCapture(e.pointerId); e.stopPropagation(); });
+  card.addEventListener("pointermove", e => { if (!dragging) return; dy = e.clientY - sy; card.style.transform = "translateY(" + Math.min(0, dy) + "px)"; });
+  card.addEventListener("pointerup", e => {
+    dragging = false;
+    const id = card.dataset.sw;
+    if (dy < -80){ card.style.transform = "translateY(-60px)"; terminateApp(id); setTimeout(() => { closeSwitcher(); if (S.openApps.length) openSwitcher(); }, 160); }
+    else { card.style.transform = ""; if (Math.abs(dy) < 8){ closeSwitcher(); if (id !== S.currentApp) openApp(id); } }
+    e.stopPropagation();
+  });
+}
+
+/* ============ APP CONTENT (Phase 0 stubs with real pieces) ============ */
+function appContent(id){
+  const a = appById(id);
+  const head = '<div class="app-head"><h2>' + a.name + '</h2><span class="micro">TetaOS 1.0</span></div><div class="app-body">';
+  if (id === "works"){
+    return head + PROJECTS.map(p =>
+      '<div class="proj"><b>' + p[0] + '</b><div class="tags"><i>' + p[1] + '</i><i>Live site</i></div><p>' + p[2] + '</p></div>').join("") + "</div>";
+  }
+  if (id === "terminal"){
+    return head + '<div class="term" id="termBox"><span id="termOut"></span><div><span class="tp">teta@teta-one:~$ </span><input id="termIn" autocomplete="off" spellcheck="false" aria-label="Terminal input"></div></div>' +
+      '<p style="font-size:.72rem;color:var(--ink3);margin-top:10px">Try: help, teta-fetch, whoami, projects, open works, exit</p></div>';
+  }
+  if (id === "notes"){
+    return head +
+      '<div class="note-card"><b>Process (pinned)</b><p>Discover, Design, Build, Ship. One idea per screen, no fluff, real numbers only.</p></div>' +
+      '<div class="note-card"><b>Services</b><p>Web design, branding, ideation, SEO. Lagos based, working with clients in the UK, US, Canada and Ireland.</p></div>' +
+      '<div class="note-card"><b>Ideas that shipped</b><p>Marksheet, Movaldem platform, Clinic Staff App, BellePal, xylvar.</p></div></div>';
+  }
+  if (id === "files"){
+    return head + ["readme.txt","resume.pdf","Projects/ (11 project files)","Notes/ (3 notes)","Photos/","Wallpapers/","Trash/"].map(f =>
+      '<div class="note-card"><b>' + f + '</b></div>').join("") +
+      '<p style="font-size:.78rem;color:var(--ink3)">Phase 0 note: this is the seeded filesystem view. Create, rename, move and the shared store with Terminal land in Phase 3.</p></div>';
+  }
+  if (id === "settings"){
+    return head +
+      '<div class="set-row"><div>FPS (live)<small>Phase 0 gate metric. Target: steady 60 during gestures.</small></div><div class="fps-big fps-val">60</div></div>' +
+      '<div class="set-row"><div>Spring config<small>One spring system for the whole OS.</small></div><div class="micro">170 / 26 / 1</div></div>' +
+      '<div class="set-row"><div>Wallpaper<small>Applies to lock and home.</small></div><div class="wp-pick">' +
+        '<button data-wp="" style="background:linear-gradient(160deg,#191920,#050505)" aria-label="Wallpaper 1"></button>' +
+        '<button data-wp="wp2" style="background:linear-gradient(160deg,#131a22,#050505)" aria-label="Wallpaper 2"></button>' +
+        '<button data-wp="wp3" style="background:linear-gradient(160deg,#101010,#050505)" aria-label="Wallpaper 3"></button></div></div>' +
+      '<div class="set-row"><div>Reduce motion<small>Springs snap instead of animating.</small></div><button class="switch" id="setMotion" aria-label="Reduce motion"></button></div>' +
+      '<div class="set-row"><div>About: Teta One<small>TetaOS 1.0, Chip: Ideation, Memory: Branding, Graphics: Web Design. Designed in Lagos by Adebiyi Thompson.</small></div></div>' +
+      '<button class="clearall" id="setSleep">Sleep device</button></div>';
+  }
+  if (id === "contact"){
+    return head + '<div class="generic"><p>Available for projects. Email first: tell me what you are building, your timeline, and your budget range.</p>' +
+      '<p><b style="color:var(--ink);font-weight:500">susriter@gmail.com</b></p>' +
+      '<a class="clearall" style="display:block;text-align:center;text-decoration:none" href="mailto:susriter@gmail.com?subject=Project%20enquiry%20from%20TetaOS">Write an email</a>' +
+      '<button class="clearall" id="copyMail">Copy email address</button></div></div>';
+  }
+  if (id === "clock"){
+    return head + '<div class="generic"><p>Lagos <b style="color:var(--ink)" id="ckLagos">--:--</b></p><p>London <b style="color:var(--ink)" id="ckLondon">--:--</b></p><p>Toronto <b style="color:var(--ink)" id="ckToronto">--:--</b></p><p>New York <b style="color:var(--ink)" id="ckNY">--:--</b></p><p style="font-size:.78rem;color:var(--ink3)">World clock is live. Alarms and timer join it in v1.5.</p></div></div>';
+  }
+  const phaseNote = {
+    camera:"Camera arrives in Phase 5 with real viewfinder capture into Photos and Files.",
+    photos:"Photos arrives in Phase 5, fed by Camera captures and the Projects album.",
+    music:"Music is v1.5: Web Audio visualiser driving the Teta Capsule.",
+    weather:"Weather is v1.5: live Lagos weather from a keyless source.",
+    calendar:"Calendar is a v2 candidate. It is here so the grid feels like a real phone.",
+    calculator:"Calculator is v1.5, with history. It lost its v1 seat to Works and Contact."
+  };
+  return head + '<div class="generic"><p>' + (phaseNote[id] || "This app is a stub in the Phase 0 shell.") + '</p><p>The point of Phase 0 is the shell: springs, gestures, lifecycle. If this window opened from its icon, shrinks home, and survives the switcher, the gate is doing its job.</p></div></div>';
+}
+function attachApp(id){
+  if (id === "terminal") attachTerminal();
+  if (id === "settings"){
+    document.querySelectorAll(".wp-pick button").forEach(b => b.addEventListener("click", () => {
+      wallpaperEl.className = "wallpaper" + (b.dataset.wp ? " " + b.dataset.wp : "");
+      document.querySelectorAll(".wp-pick button").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); blip(620,.05);
+    }));
+    const sw = $("setMotion");
+    sw.addEventListener("click", () => { S.reduceMotion = !S.reduceMotion; sw.classList.toggle("on", S.reduceMotion); });
+    $("setSleep").addEventListener("click", () => sleepDevice());
+  }
+  if (id === "contact"){
+    const cm = $("copyMail");
+    if (cm) cm.addEventListener("click", () => { try{ navigator.clipboard.writeText("susriter@gmail.com"); }catch(e){} cm.textContent = "Copied"; });
+  }
+  if (id === "clock"){
+    const zones = [["ckLagos","Africa/Lagos"],["ckLondon","Europe/London"],["ckToronto","America/Toronto"],["ckNY","America/New_York"]];
+    const upd = () => zones.forEach(z => { const e = $(z[0]); if (e) e.textContent = new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:z[1]}); });
+    upd(); const iv = setInterval(() => { if (!$("ckLagos")){ clearInterval(iv); return; } upd(); }, 5000);
+  }
+}
+/* terminal */
+function attachTerminal(){
+  const out = $("termOut"), input = $("termIn");
+  const hist = []; let hi = 0;
+  const print = (t, push) => { out.textContent += (push ? "teta@teta-one:~$ " + push + "\n" : "") + t + "\n"; input.scrollIntoView({block:"end"}); };
+  print("Teta Shell. Type help to begin.");
+  input.focus();
+  $("termBox").addEventListener("click", () => input.focus());
+  input.addEventListener("keydown", e => {
+    if (e.key === "ArrowUp"){ e.preventDefault(); if (hi > 0){ hi--; input.value = hist[hi] || ""; } return; }
+    if (e.key === "ArrowDown"){ e.preventDefault(); if (hi < hist.length){ hi++; input.value = hist[hi] || ""; } return; }
+    if (e.key !== "Enter") return;
+    const raw = input.value.trim(); input.value = "";
+    if (raw) { hist.push(raw); hi = hist.length; }
+    const cmd = raw.toLowerCase();
+    if (cmd === "clear"){ out.textContent = ""; return; }
+    if (cmd === "exit"){ print("", raw); closeApp(); return; }
+    if (cmd === "help"){ print("Commands: help, whoami, skills, projects, contact, teta-fetch, open works, open notes, clear, exit", raw); return; }
+    if (cmd === "whoami"){ print("Adebiyi Thompson. Web designer, Teta Digitals, Lagos. Web design, branding, ideation.", raw); return; }
+    if (cmd === "skills"){ print("Web design, branding, ideation, SEO, motion, product UI.", raw); return; }
+    if (cmd === "projects"){ print(PROJECTS.map(p => p[0]).join(", "), raw); return; }
+    if (cmd === "contact"){ print("Email: susriter@gmail.com. Email first, video call for the conversation.", raw); return; }
+    if (cmd === "teta-fetch"){
+      print([" _______ _____ _______  ______  _______",
+             "    |    |______    |    |_____| |_____|",
+             "    |    |______    |    |     | |     |",
+             "Device:  Teta One",
+             "OS:      TetaOS 1.0",
+             "Shell:   Teta Shell (springs, not tweens)",
+             "Designer: Adebiyi Thompson",
+             "Base:    Lagos, NG",
+             "Accent:  #f9452d  [##]"].join("\n"), raw); return;
+    }
+    if (cmd.startsWith("open ")){
+      const target = cmd.slice(5).trim();
+      const found = APPS.find(a => a.id === target || a.name.toLowerCase() === target);
+      print(found ? "Opening " + found.name + "." : "No app named " + target + ".", raw);
+      if (found) setTimeout(() => openApp(found.id), 350);
+      return;
+    }
+    if (cmd === ""){ print("", raw); return; }
+    print("teta: command not found: " + raw + ". Type help.", raw);
+  });
+}
+</script>
+<script>
+"use strict";
+function setupPaging(){ /* paging is handled by the central gesture engine */ }
+function updateDots(){
+  document.querySelectorAll("#pageDots i").forEach((d,i) => d.classList.toggle("on", i === S.page));
+}
+
+/* ============ CENTRAL GESTURE ENGINE ============ */
+let G = null;
+function ptrPos(e){ const r = screenRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+
+screenEl.addEventListener("pointerdown", e => {
+  if (!S.booted || S.sleeping) return;
+  if (e.target.closest(".sw-card")) return;
+  if (e.target.closest("input") || e.target.closest("a")) return;
+  const p = ptrPos(e);
+  const now = performance.now();
+  G = { mode:null, sx:p.x, sy:p.y, x:p.x, y:p.y, lastT:now, lastMoveT:now,
+        vx:0, vy:0, moved:0, topWhich:null, appDy:0, basePageX:0, holdTimer:null };
+  if (topOpen){
+    if (p.y < 150){ G.mode = "topdrag"; const spr = topOpen === "shade" ? shadeSpring : ccSpring; spr.grab(); }
+    else { G = null; return; }
+  }
+  else if (S.locked){
+    if (e.target.closest("#lock button")){ G = null; return; }
+    G.mode = "lock"; lockSpring.grab();
+  }
+  else if (p.y <= 26){ G.mode = "topcand"; }
+  else if (S.currentApp && p.y >= H() - 30){
+    G.mode = "apphome"; appSpring.grab();
+    G.holdTimer = setInterval(() => {
+      if (!G || G.mode !== "apphome") { clearInterval(G && G.holdTimer); return; }
+      if (-G.appDy > 60 && performance.now() - G.lastMoveT > 240){
+        clearInterval(G.holdTimer);
+        appSpring.x = 1; appSpring.onUpdate(1);
+        const g = G; G = null;
+        openSwitcher();
+      }
+    }, 40);
+  }
+  else if (S.currentApp && p.x <= 16){ G.mode = "edge"; }
+  else if (!S.currentApp && e.target.closest("#pagesVp")){ G.mode = "pagecand"; }
+  else { G = null; return; }
+  try{ screenEl.setPointerCapture(e.pointerId); }catch(err){}
+}, { passive:true });
+
+screenEl.addEventListener("pointermove", e => {
+  if (!G) return;
+  const p = ptrPos(e), now = performance.now();
+  const dt = Math.max(1, now - G.lastT);
+  const ivx = (p.x - G.x) / dt, ivy = (p.y - G.y) / dt;
+  G.vx = G.vx * 0.7 + ivx * 0.3; G.vy = G.vy * 0.7 + ivy * 0.3;
+  G.x = p.x; G.y = p.y; G.lastT = now; G.lastMoveT = now;
+  const dx = p.x - G.sx, dy = p.y - G.sy;
+  G.moved = Math.max(G.moved, Math.abs(dx), Math.abs(dy));
+
+  if (G.mode === "lock"){
+    const applied = dy < 0 ? dy : dy * 0.3;
+    lockSpring.x = applied; lockSpring.onUpdate(applied);
+    G.appDy = dy;
+  }
+  else if (G.mode === "topcand" && dy > 12){
+    G.mode = "top";
+    G.topWhich = G.sx > W() * 0.72 ? "cc" : "shade";
+    renderShade(); renderCC();
+    $(G.topWhich).classList.remove("hidden");
+    (G.topWhich === "shade" ? shadeSpring : ccSpring).grab();
+  }
+  if (G.mode === "top"){
+    const spr = G.topWhich === "shade" ? shadeSpring : ccSpring;
+    spr.x = clamp(dy / H() * 1.2, 0, 1); spr.onUpdate(spr.x);
+  }
+  else if (G.mode === "topdrag"){
+    const spr = topOpen === "shade" ? shadeSpring : ccSpring;
+    spr.x = clamp(1 + dy / H() * 1.2, 0, 1); spr.onUpdate(spr.x);
+  }
+  else if (G.mode === "pagecand"){
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)){
+      G.mode = "page"; pageSpring.grab();
+      G.basePageX = -S.page * $("pagesVp").clientWidth;
+    } else if (G.moved > 14){ G.mode = null; }
+  }
+  else if (G.mode === "page"){
+    const vpW = $("pagesVp").clientWidth, max = -vpW;
+    let x = G.basePageX + dx;
+    if (x > 0) x = x * 0.35;
+    if (x < max) x = max + (x - max) * 0.35;
+    pageSpring.x = x; pageSpring.onUpdate(x);
+  }
+  else if (G.mode === "apphome"){
+    G.appDy = dy;
+    const prog = clamp(-dy / 300, 0, 1);
+    $("appview").style.transform = "translateY(" + (dy * 0.5) + "px) scale(" + (1 - prog * 0.12) + ")";
+    $("appview").style.borderRadius = (prog * 28) + "px";
+  }
+  else if (G.mode === "edge"){
+    if (dx > 85){ const g = G; G = null; closeApp(); }
+  }
+}, { passive:true });
+
+function endGesture(){
+  if (!G) return;
+  const g = G; G = null;
+  if (g.holdTimer) clearInterval(g.holdTimer);
+  const dy = g.y - g.sy, dx = g.x - g.sx;
+  if (g.moved > 10) S.suppressClickUntil = Date.now() + 260;
+
+  if (g.mode === "lock"){
+    if (dy < -90 || g.vy < -0.5) unlock();
+    else lockSpring.setTarget(0, clamp(g.vy * 1000, -1600, 1600));
+  }
+  else if (g.mode === "top"){
+    const spr = g.topWhich === "shade" ? shadeSpring : ccSpring;
+    if (spr.x > 0.32 || g.vy > 0.4){ topOpen = g.topWhich; spr.setTarget(1, clamp(g.vy * 900, -800, 1400)); blip(600,.05); }
+    else { spr.onSettle = () => $(g.topWhich).classList.add("hidden"); spr.setTarget(0, clamp(g.vy * 900, -800, 1400)); }
+  }
+  else if (g.mode === "topdrag"){
+    const spr = topOpen === "shade" ? shadeSpring : ccSpring, which = topOpen;
+    if (spr.x > 0.62 && g.vy > -1.1){ spr.setTarget(1); }
+    else { topOpen = null; spr.onSettle = () => $(which).classList.add("hidden"); spr.setTarget(0, clamp(g.vy * 900, -1400, 800)); }
+  }
+  else if (g.mode === "page"){
+    const vpW = $("pagesVp").clientWidth;
+    const pos = -pageSpring.x / vpW;
+    let target = Math.round(pos);
+    if (g.vx < -0.4) target = Math.ceil(pos);
+    if (g.vx > 0.4) target = Math.floor(pos);
+    S.page = clamp(target, 0, 1);
+    pageSpring.setTarget(-S.page * vpW, clamp(g.vx * 1000, -1800, 1800));
+    updateDots();
+  }
+  else if (g.mode === "apphome"){
+    if (g.moved < 8){ closeApp(); }
+    else if (g.appDy < -110 || g.vy < -0.55){ closeApp(); }
+    else { appSpring.x = 0.9; appSpring.setTarget(1, clamp(g.vy * 600, -900, 900)); }
+  }
+}
+screenEl.addEventListener("pointerup", endGesture);
+screenEl.addEventListener("pointercancel", endGesture);
+screenEl.addEventListener("contextmenu", e => e.preventDefault());
+$("homebar").addEventListener("click", () => {
+  if (topOpen) closeTopLayers();
+  else if (S.currentApp) closeApp();
+});
+
+/* ============ BOOT ============ */
+let bootDone = false;
+function finishBoot(){
+  if (bootDone) return; bootDone = true; S.booted = true;
+  $("boot").classList.add("hidden");
+  $("lock").classList.remove("hidden");
+  $("statusbar").classList.remove("hidden");
+  $("capsule").classList.remove("hidden");
+  $("homebar").classList.remove("hidden");
+  lockSpring.x = 0; lockSpring.onUpdate(0);
+  setCapsule("Locked", false);
+  tickClock();
+}
+function runBoot(){
+  renderLock(); renderHome(); renderShade(); renderCC();
+  initSprings();
+  const services = ["filesystem","settings store","sound engine","app registry","spring core","gesture engine"];
+  let i = 0, pct = 0;
+  const svcIv = setInterval(() => { $("bootSvc").textContent = "Starting " + services[i % services.length]; i++; }, 340);
+  const barIv = setInterval(() => {
+    pct = Math.min(100, pct + 4 + Math.random() * 7);
+    $("bootBar").style.width = pct + "%";
+    if (pct >= 100){ clearInterval(barIv); clearInterval(svcIv); setTimeout(finishBoot, 220); }
+  }, 90);
+  $("boot").addEventListener("click", () => { clearInterval(barIv); clearInterval(svcIv); finishBoot(); });
+}
+runBoot();
+</script>
+</body>
+</html>
