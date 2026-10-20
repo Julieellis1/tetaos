@@ -34,7 +34,7 @@
         } catch (e) {}
       })();
     </script>
-    <script>if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) document.documentElement.classList.add("x-standalone");</script>
+    <script>if (window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: fullscreen)").matches || window.matchMedia("(display-mode: minimal-ui)").matches || window.matchMedia("(display-mode: window-controls-overlay)").matches || navigator.standalone) document.documentElement.classList.add("x-standalone");</script>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&amp;display=swap"/>
@@ -191,17 +191,15 @@
       .x-hol__end .x-cta, .x-hol__end .x-pill { width: 100%; justify-content: center; }
       .x-conf { position: absolute; top: -12px; width: 8px; height: 12px; border-radius: 2px; animation: x-fall 2.6s linear forwards; pointer-events: none; }
       @keyframes x-fall { to { transform: translateY(820px) rotate(720deg); opacity: .2; } }
-      /* Teta Ladder: rules, timer ring, intro, unlock modal */
+      /* Teta Ladder: rules, timer bar, intro, unlock modal */
       .x-hol .x-hol__main { grid-template-columns: 58px 1fr; }
       .x-rail li small { font-size: 12px; color: var(--x-accent); margin-left: 4px; }
       .x-hlock { margin: 6px 0 0; font-size: 13px; color: var(--c-dim); }
       .x-hlock b { color: var(--x-accent); font-weight: 600; }
       .x-c3 { position: relative; }
-      .x-ring { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); pointer-events: none; overflow: visible; }
-      .x-ring rect { fill: none; stroke-width: 3; }
-      .x-ring .bg { stroke: var(--c-line); }
-      .x-ring .fg { stroke: var(--x-accent); stroke-linecap: round; transition: stroke .2s; }
-      .x-ring.low .fg { stroke: #ff9f0a; }
+      .x-hbar { height: 6px; border-radius: 99px; background: var(--c-line); overflow: hidden; }
+      .x-hbar i { display: block; height: 100%; border-radius: 99px; background: var(--x-accent); transform-origin: 0 50%; transform: scaleX(1); }
+      .x-hbar.low i { background: #ff9f0a; }
       .x-hchip { justify-self: center; display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--c-line); font-size: 12px; color: var(--c-text); }
       .x-hchip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--x-accent); }
       .x-hhint { margin: 0; font-size: 12px; color: var(--x-accent); }
@@ -403,6 +401,7 @@
       .x-call__btns button { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; touch-action: manipulation; cursor: pointer; }
       .x-call__btns svg { width: 30px; height: 30px; fill: #fff; pointer-events: none; }
       #callNo { background: #ff3b30; } #callNo svg { transform: rotate(135deg); } #callYes { background: #34c759; }
+      #callEnd { background: #ff3b30; } #callEnd svg { transform: rotate(135deg); } #callLive { justify-content: center; } .x-call__btns[hidden] { display: none; }
       .x-composer button svg { width: 20px; height: 20px; stroke: #050505; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .x-composer :disabled { opacity: .35; }
       .x-toast { position: absolute; top: 128px; left: 50%; transform: translate(-50%, -8px); z-index: 4; padding: 8px 14px; border-radius: 99px; font-size: 12px; font-weight: 400; background: var(--c-panel); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
@@ -427,6 +426,15 @@
       html.x-standalone .x-device { position: static; width: 100%; height: 100%; transform: none; padding: 0; border-radius: 0; background: none; box-shadow: none; }
       html.x-standalone .x-screen { width: 100%; height: 100%; border-radius: 0; }
       html.x-standalone .x-app { border-radius: 0; }
+      /* Installed app on any platform (notably Windows, where the window is wide): keep the phone view, never the desktop stage */
+      @media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui), (display-mode: window-controls-overlay) {
+        .x-stage { display: block; padding: 0; }
+        .x-bigword, .x-side, .x-btn { display: none; }
+        .x-holder, html.x-standalone .x-holder { width: min(480px, 100vw); height: 100vh; height: 100dvh; margin: 0 auto; }
+        .x-device { position: static; width: 100%; height: 100%; transform: none; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+        .x-screen { width: 100%; height: 100%; border-radius: 0; }
+        .x-app { border-radius: 0; }
+      }
       @media (prefers-reduced-motion: reduce) { * { transition-duration: .01s !important; } }
 
       /* Terminal */
@@ -666,10 +674,10 @@
                     <p class="x-micro" id="hLvl">Level 1 of 20</p>
                     <div class="x-c3" id="hBox">
                       <div class="x-c3__in" id="hCard"><div class="x-c3__f x-glass" id="hCur">50</div><div class="x-c3__f x-c3__b x-glass" id="hNext"></div></div>
-                      <svg class="x-ring" id="hRing" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><rect class="bg" x="1" y="1" width="98" height="98" rx="14" ry="20" vector-effect="non-scaling-stroke"></rect><rect class="fg" id="hRingFg" x="1" y="1" width="98" height="98" rx="14" ry="20" pathLength="100" stroke-dasharray="100 100" vector-effect="non-scaling-stroke"></rect></svg>
                     </div>
+                    <div class="x-hbar" id="hRing" role="timer" aria-label="Time left for this level"><i id="hRingFg"></i></div>
                     <span class="x-hchip" id="hRule">Range 1–100 · 12s</span>
-                    <p class="x-hhint" id="hHint">Next: L5 · 20% off</p>
+                    <p class="x-hhint" id="hHint">Next: L10 · 10% off</p>
                     <p class="x-micro" id="hMsg" aria-live="polite">Will the next number be higher or lower?</p>
                     <div class="x-hol__btns"><button class="x-hbtn x-glass" id="hHi">Higher</button><button class="x-hbtn x-glass" id="hLo">Lower</button></div>
                     <button class="x-pill" id="hCash">Cash out</button>
@@ -688,20 +696,20 @@
                   <h2>Teta Ladder</h2>
                   <h3>Win a real discount on your project with Teta Digitals</h3>
                   <div class="x-htiers">
-                    <div class="x-htier"><span>Level 5</span><b>20% off</b></div>
-                    <div class="x-htier"><span>Level 8</span><b>30% off</b></div>
-                    <div class="x-htier"><span>Level 10+</span><b>50% off</b></div>
+                    <div class="x-htier"><span>Level 10</span><b>10% off</b></div>
+                    <div class="x-htier"><span>Level 15</span><b>20% off</b></div>
+                    <div class="x-htier"><span>Level 20</span><b>50% off</b></div>
                   </div>
                   <p class="x-hsmall">Applies to a new website or app project. Claim your code through Contact; Adebiyi confirms it on enquiry. One per client.</p>
                   <button class="x-cta" id="hGo">Start</button>
                 </div>
                 <div class="x-hmod" id="hMod" role="dialog" aria-modal="true" aria-labelledby="hModT" hidden="">
                   <div class="x-hmod__p">
-                    <p class="x-micro">Level <span id="hModL">5</span> reached</p>
-                    <h3 id="hModT">You&#39;ve unlocked 20% off a Teta Digitals project</h3>
+                    <p class="x-micro">Level <span id="hModL">10</span> reached</p>
+                    <h3 id="hModT">You&#39;ve unlocked 10% off a Teta Digitals project</h3>
                     <button class="x-cta" id="hModClaim">Claim now</button>
                     <button class="x-pill" id="hModKeep">Keep climbing</button>
-                    <p class="x-hsmall" id="hModW">A wrong guess from here still keeps your 20% off.</p>
+                    <p class="x-hsmall" id="hModW">A wrong guess from here still keeps your 10% off.</p>
                   </div>
                 </div>
               </div>
@@ -1084,15 +1092,18 @@
               <svg class="x-inst__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M6 13l6 6 6-6"></path></svg>
             </div>
             <div class="x-layer x-crt" id="crt" hidden="" aria-live="polite"></div>
-            <div class="x-layer x-call" id="call" role="alertdialog" aria-label="Incoming call: Future Client, a playful demo" aria-hidden="true">
+            <div class="x-layer x-call" id="call" role="alertdialog" aria-label="Incoming call: Adebiyi Thompson, a playful demo" aria-hidden="true">
               <div class="x-call__bg" id="callBg"></div>
               <p class="x-call__tag">playful demo</p>
-              <h2>Future Client</h2>
-              <p class="x-call__sub">TetaOS mobile…</p>
+              <h2>Adebiyi Thompson</h2>
+              <p class="x-call__sub" id="callSub">Teta Digitals · Lagos</p>
               <div class="x-call__av" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4.2"></circle><path d="M3.5 21a8.5 8.5 0 0 1 17 0z"></path></svg></div>
-              <div class="x-call__btns">
+              <div class="x-call__btns" id="callBtns">
                 <span><button type="button" id="callNo" aria-label="Decline"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"></path></svg></button>Decline</span>
                 <span><button type="button" id="callYes" aria-label="Accept"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"></path></svg></button>Accept</span>
+              </div>
+              <div class="x-call__btns" id="callLive" hidden="">
+                <span><button type="button" id="callEnd" aria-label="End call"><svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"></path></svg></button>End call</span>
               </div>
             </div>
             <div class="x-layer x-fade" id="fade"></div>
@@ -1787,11 +1798,11 @@
         return function () { requestAnimationFrame(function () { fit(); run(); }); };
       })();
 
-      /* Teta Ladder: Higher or Lower, 20 levels, discount tiers at 5 / 8 / 10 */
+      /* Teta Ladder: Higher or Lower, 20 levels, discount tiers at 10 / 15 / 20 */
       var hol = { lvl: 1, cur: 0, tier: 0, busy: false, code: "" };
       var holBest = store.get("holBest") || { lvl: 0, tier: 0, code: "" };
       function rnd(n) { return 1 + Math.floor(Math.random() * n); }
-      function tierOf(l) { return l >= 10 ? 50 : l >= 8 ? 30 : l >= 5 ? 20 : 0; }
+      function tierOf(l) { return l >= 20 ? 50 : l >= 15 ? 20 : l >= 10 ? 10 : 0; }
       function buzz(p) { if (state.mute) return; try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
       function tone(f) {
         if (state.mute) return;
@@ -1802,7 +1813,7 @@
           o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .32);
         } catch (e) {}
       }
-      for (var hi = 1; hi <= 20; hi++) { var li = document.createElement("li"); li.textContent = hi; var tl = tierOf(hi); if (hi === 5 || hi === 8 || hi === 10) { li.className = "mk"; li.insertAdjacentHTML("beforeend", "<small>" + tl + "%</small>"); } $("hRail").appendChild(li); }
+      for (var hi = 1; hi <= 20; hi++) { var li = document.createElement("li"); li.textContent = hi; var tl = tierOf(hi); if (hi === 10 || hi === 15 || hi === 20) { li.className = "mk"; li.insertAdjacentHTML("beforeend", "<small>" + tl + "%</small>"); } $("hRail").appendChild(li); }
       /* Visible rules per level; every draw is uniform in its stated range, nothing is rigged */
       function holRange(l) { return l <= 4 ? 100 : l <= 9 ? 500 : l <= 14 ? 1000 : 5000; }
       function holSecs(l) { return Math.max(3, 12 - .5 * (l - 1)); }
@@ -1812,7 +1823,7 @@
         var lo = Math.max(1, Math.ceil(mid - h)), up = Math.min(R, Math.floor(mid + h));
         return lo + Math.floor(Math.random() * (up - lo + 1));
       }
-      function holNextTier(l) { return l < 5 ? 5 : l < 8 ? 8 : l < 10 ? 10 : 0; }
+      function holNextTier(l) { return l < 10 ? 10 : l < 15 ? 15 : l < 20 ? 20 : 0; }
       function holBestDraw() { $("hBest").textContent = holBest.lvl ? "Best: L" + holBest.lvl + (holBest.tier ? " · " + holBest.code : "") : "Best: none yet"; }
       function holDraw() {
         var l = hol.lvl, nt = holNextTier(l);
@@ -1823,10 +1834,10 @@
         $("hRule").textContent = "Range 1–" + holRange(l) + " · " + holSecs(l) + "s" + (l >= 8 ? " · Ties lose" : "") + (l >= 12 ? " · Memorise" : "") + (l >= 16 ? " · Buttons shuffle" : "");
         $("hHint").textContent = nt ? "Next: L" + nt + " · " + tierOf(nt) + "% off" : "50% locked in · climb to L20";
       }
-      /* Countdown ring: drains only while the game is on screen */
+      /* Countdown bar: drains only while the game is on screen */
       var holT = { on: false, left: 0, dur: 1, last: 0, raf: 0 };
       function holVisible() { return app.classList.contains("is-open") && app.dataset.cur === "Higher or Lower" && !document.hidden && $("hMod").hidden && $("hEnd").hidden && $("hIntro").hidden; }
-      function holRing() { var f = Math.max(0, holT.left / holT.dur); $("hRingFg").setAttribute("stroke-dasharray", f * 100 + " 100"); $("hRing").classList.toggle("low", holT.on && holT.left < 3000); }
+      function holRing() { var f = Math.max(0, holT.left / holT.dur); $("hRingFg").style.transform = "scaleX(" + f + ")"; $("hRing").classList.toggle("low", holT.on && holT.left < 3000); }
       function holTimerStop() { holT.on = false; cancelAnimationFrame(holT.raf); }
       function holTimerStart() { holTimerStop(); holT.dur = holT.left = holSecs(hol.lvl) * 1000; holT.on = true; holT.last = performance.now(); holT.raf = requestAnimationFrame(holTick); }
       function holTick(now) {
@@ -1889,7 +1900,7 @@
             hol.tier = t; holDraw(); $("hMsg").textContent = t + "% unlocked";
             capsule.show("hol", '<span class="x-cap__dot"></span><span>' + t + "% unlocked</span>", function () { if (!locked) nsOpenApp("Higher or Lower")(); });
             setTimeout(function () { capsule.hide("hol"); }, 2600);
-            if (!store.get("holNotif")) { try { store.set("holNotif", 1); } catch (e) {} postNotification("Higher or Lower", "", "Teta Ladder: real discounts are live. Reach level 5 for 20% off.", nsOpenApp("Higher or Lower")); }
+            if (!store.get("holNotif")) { try { store.set("holNotif", 1); } catch (e) {} postNotification("Higher or Lower", "", "Teta Ladder: real discounts are live. Reach level 10 for 10% off.", nsOpenApp("Higher or Lower")); }
             $("hModL").textContent = l; $("hModT").textContent = "You've unlocked " + t + "% off a Teta Digitals project";
             $("hModW").textContent = "Keep climbing for more. A wrong guess still keeps your " + t + "% off.";
             return setTimeout(function () { $("hMod").hidden = false; $("hModKeep").focus(); }, 450);
@@ -1905,7 +1916,7 @@
         holTimerStop(); $("hMod").hidden = true; holRing();
         $("hEndK").textContent = why === "win" ? "You reached level 20" : why === "cash" ? "Cashed out at level " + hol.lvl : why === "time" ? "Time ran out at level " + hol.lvl : why === "tie" ? "A tie at level " + hol.lvl + ". Ties lose" : "Game over at level " + hol.lvl;
         $("hEndT").textContent = t ? t + "% off" : "No reward yet";
-        $("hEndS").textContent = t ? "Your Teta Digitals project discount" : "Reach level 5 to unlock 20% off.";
+        $("hEndS").textContent = t ? "Your Teta Digitals project discount" : "Reach level 10 to unlock 10% off.";
         $("hRew").hidden = $("hClaim").hidden = $("hCopy").hidden = !t; $("hCode").textContent = hol.code;
         if (hol.lvl > holBest.lvl) holBest.lvl = hol.lvl;
         if (t > holBest.tier) { holBest.tier = t; holBest.code = hol.code; }
@@ -2137,7 +2148,7 @@
         var fresh = !chat.started, step = chat.step; chat.started = true; chat.run++;
         nsOpenApp("Contact")();
         [].forEach.call(msgs.querySelectorAll(".x-typing, .x-replies"), function (n) { n.remove(); });
-        var lines = ["This is a playful demo call 🙂", "But real projects start right here."];
+        var lines = ["Thanks for picking up 🙂", "Real projects start right here."];
         if (fresh || !step) lines.push("I'm Adebiyi, a web designer and app developer in Lagos. First, what's your name?");
         say(lines, function () { if (fresh || !step) ask("name"); else if (step !== "done") ask(step); });
       }
@@ -2648,7 +2659,11 @@
         } catch (e) {}
       }
       function callEnd() {
-        clearTimeout(callT); clearInterval(callTone);
+        clearTimeout(callT); clearInterval(callTone); clearInterval(callLiveT); callLive = false;
+        try { callVoice.pause(); } catch (e) {}
+        if ($("callBtns")) $("callBtns").hidden = false;
+        if ($("callLive")) $("callLive").hidden = true;
+        if ($("callSub")) $("callSub").textContent = "Teta Digitals · Lagos";
         callEl.classList.remove("is-on"); callEl.setAttribute("aria-hidden", "true"); capsule.hide("call");
       }
       function callRing() {
@@ -2666,8 +2681,27 @@
         if (callDone || locked || document.hidden) return;
         if (++callUp >= 120 && !state.dnd && !$("pinPad").classList.contains("is-on")) callRing();
       }, 1000);
+      /* Voice call: on pickup, play Adebiyi's uploaded voice note (voice-call.mp3 at the site root), then hand over to Contact */
+      var callVoice = new Audio("voice-call.mp3"); callVoice.preload = "auto";
+      var callLiveT = 0, callLive = false;
+      function callFinish() { callEnd(); callChat(); }
+      function callAnswer() {
+        clearTimeout(callT); clearInterval(callTone); callLive = true;
+        capsule.show("call", '<span>● On call</span>', function () { callEl.classList.add("is-on"); });
+        $("callBtns").hidden = true; $("callLive").hidden = false;
+        var secs = 0; $("callSub").textContent = "Connected · 0:00";
+        callLiveT = setInterval(function () { secs++; $("callSub").textContent = "Connected · " + Math.floor(secs / 60) + ":" + ("0" + (secs % 60)).slice(-2); }, 1000);
+        var fell = false;
+        function fallback() { if (!fell && callLive) { fell = true; setTimeout(callFinish, 900); } }
+        callVoice.addEventListener("ended", function () { if (callLive) callFinish(); }, { once: true });
+        callVoice.addEventListener("error", fallback, { once: true });
+        var p = null; try { callVoice.currentTime = 0; p = callVoice.play(); } catch (e) { fallback(); }
+        if (p && p.catch) p.catch(fallback);
+        setTimeout(function () { if (callLive && callVoice.readyState === 0 && !fell) fallback(); }, 5000);
+      }
       $("callNo").addEventListener("click", callEnd);
-      $("callYes").addEventListener("click", function () { callEnd(); callChat(); });
+      $("callYes").addEventListener("click", callAnswer);
+      $("callEnd").addEventListener("click", callFinish);
 
       /* Camera: real getUserMedia viewfinder, never a fake one; captures go to a shared photos array and Photos/ */
       var photos = [], cam = { s: null, user: false, flash: false, ok: false, n: 0 }, camV = $("camV");
@@ -2899,7 +2933,7 @@
 
       /* Install to home screen: beforeinstallprompt on Chromium, Share-sheet steps on iOS */
       var instPrompt = null, instNope = false;
-      function instStandalone() { return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; }
+      function instStandalone() { return window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: fullscreen)").matches || window.matchMedia("(display-mode: minimal-ui)").matches || window.matchMedia("(display-mode: window-controls-overlay)").matches || navigator.standalone === true; }
       function instFramed() { try { return window.self !== window.top; } catch (e) { return true; } }
       function instIOS() { return /iP(hone|ad|od)/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1); }
       function instMode() { if (instStandalone() || instFramed()) return null; if (instPrompt) return "prompt"; if (instIOS()) return "ios"; return null; }
