@@ -254,7 +254,7 @@ body{
 .dock .appicon span{display:none}
 .dock .appicon .ico{width:58px;height:58px}
 /* ---------- shade / cc ---------- */
-#shade,#cc{z-index:70;background:rgba(10,10,12,.45);backdrop-filter:blur(26px);padding:64px 18px 24px;will-change:transform;overflow-y:auto}
+#shade,#cc{z-index:70;background:rgba(10,10,12,.45);backdrop-filter:blur(26px);padding:64px 18px 58px;will-change:transform;overflow-y:auto}
 #shade h3,#cc h3{font-size:.68rem;letter-spacing:.13rem;text-transform:uppercase;color:var(--ink2);margin:6px 2px 12px;font-weight:400}
 #shade .notif{margin-bottom:8px;cursor:pointer}
 .clearall{width:100%;margin-top:6px;background:var(--glass);border:1px solid var(--hair);color:var(--ink);border-radius:14px;padding:11px;font-family:inherit;font-size:.8rem;cursor:pointer}
@@ -315,6 +315,61 @@ body{
 .sw-card b{font-weight:400;font-size:1.05rem}
 .sw-card p{font-size:.8rem;color:var(--ink3);line-height:1.5;margin-top:6px;font-weight:200}
 .sw-card .sw-tag{margin-top:auto}
+/* ---------- back button + layer grab handle ---------- */
+.back-btn{
+  flex:none;display:inline-flex;align-items:center;gap:3px;margin-right:12px;
+  background:var(--glass);border:1px solid var(--hair);color:var(--ink);
+  border-radius:20px;padding:6px 13px 6px 9px;font-family:inherit;font-size:.8rem;cursor:pointer;
+}
+.back-btn b{font-size:1.1rem;font-weight:300;line-height:1}
+.layer-grab{
+  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  width:170px;height:32px;display:flex;justify-content:center;align-items:flex-start;
+  cursor:pointer;z-index:6;background:none;border:none;
+}
+.layer-grab i{width:120px;height:5px;border-radius:3px;background:rgba(255,255,255,.55);display:block;margin-top:9px}
+/* ---------- light theme: full surface overrides ---------- */
+#screen.light{--panel:#e9e9ee;--panel2:#ffffff;--ink:#151517;--ink2:#4c4c55;--ink3:#77777f;--glass:rgba(20,20,30,.055);--hair:rgba(0,0,0,.11)}
+#screen.light .wallpaper{background:
+  radial-gradient(120% 70% at 80% 0%,rgba(249,69,45,.13),transparent 55%),
+  radial-gradient(90% 60% at 10% 90%,rgba(0,0,0,.05),transparent 60%),
+  linear-gradient(165deg,#f5f5f7 0%,#e7e7eb 55%,#eeeeF1 100%)}
+#screen.light .wallpaper.wp2{background:
+  radial-gradient(120% 70% at 15% 0%,rgba(0,0,0,.05),transparent 55%),
+  radial-gradient(80% 55% at 90% 95%,rgba(249,69,45,.16),transparent 60%),
+  linear-gradient(200deg,#eef1f5 0%,#e5e7eb 60%,#eceef1 100%)}
+#screen.light .wallpaper.wp3{background:
+  radial-gradient(100% 60% at 50% 110%,rgba(249,69,45,.10),transparent 60%),
+  repeating-linear-gradient(115deg,rgba(0,0,0,.03) 0 1px,transparent 1px 90px),
+  linear-gradient(180deg,#f2f2f4,#e8e8ec)}
+#screen.light .widget{background:rgba(255,255,255,.68)}
+#screen.light .sb-ico rect:first-child{stroke:rgba(0,0,0,.35)}
+#screen.light .sb-ico path{fill:rgba(0,0,0,.35)}
+#screen.light .statusbar{color:#151517}
+#screen.light #sbBattFill{fill:#151517}
+#screen.light .capsule{background:#ffffff;color:#3a3a40;border-color:rgba(0,0,0,.08)}
+#screen.light .homebar{background:rgba(0,0,0,.8)}
+#screen.light .notif{background:rgba(255,255,255,.75)}
+#screen.light .notif p{color:#3d3d44}
+#screen.light .notif .n-ico{background:#e4e4ea}
+#screen.light .lock-shortcuts button{background:rgba(255,255,255,.65);color:#151517}
+#screen.light .appicon .ico{background:linear-gradient(160deg,#ffffff,#e2e2e8);color:#151517}
+#screen.light .appicon .ico.accented{background:linear-gradient(160deg,#ffe9e5,#ffd9d2);border-color:rgba(249,69,45,.4);color:#151517}
+#screen.light .appicon span{color:#151517;text-shadow:none}
+#screen.light .dock{background:rgba(255,255,255,.55)}
+#screen.light .dots i{background:rgba(0,0,0,.22)}
+#screen.light .dots i.on{background:#151517}
+#screen.light .batt-ring circle:first-child{stroke:rgba(0,0,0,.12)}
+#screen.light #shade,#screen.light #cc{background:rgba(238,238,244,.55)}
+#screen.light .cc-tile{background:rgba(255,255,255,.65);color:#151517}
+#screen.light .cc-tile .t-ico{background:#dcdce2;color:#151517}
+#screen.light .cc-tile.on .t-ico{background:var(--accent);color:#fff}
+#screen.light .cc-slider{background:rgba(255,255,255,.65)}
+#screen.light .clearall{color:#151517}
+#screen.light .layer-grab i{background:rgba(0,0,0,.45)}
+#screen.light .switch{background:#c7c7cd}
+#screen.light .term{background:#0a0a0a;color:#f5f5f5}
+#screen.light .term input{color:#f5f5f5}
 </style>
 <script>
 "use strict";
@@ -373,7 +428,7 @@ const S = {
   currentApp:null, openApps:[], page:0,
   airplane:false, dnd:false, muted:false, flashlight:false, light:false,
   brightness:0.85, volume:0.7, reduceMotion:false,
-  suppressClickUntil:0, batteryReal:false
+  suppressClickUntil:0, batteryReal:false, appPushed:false
 };
 const NOTIFS = [
   {app:"Works", icon:"\u25C8", title:"Movaldem Church Platform is live", body:"Church platform shipped by Teta Digitals.", time:"now"},
@@ -523,10 +578,14 @@ function renderShade(){
     (NOTIFS.length ? NOTIFS.map((n,i) =>
       '<div class="notif" data-napp="' + n.app + '"><div class="n-ico">' + n.icon + '</div><div><b>' + n.title + '</b><p>' + n.body + '</p></div><time>' + n.time + '</time></div>').join("")
       : '<p style="color:var(--ink3);font-size:.85rem;padding:8px 2px">No notifications. You are all caught up.</p>') +
-    '<button class="clearall" id="clearAll">Clear all</button>';
+    '<button class="clearall" id="clearAll">Clear all</button>' +
+    '<button class="layer-grab" id="grabShade" aria-label="Close notifications"><i></i></button>';
   const ca = $("clearAll");
-  if (ca) ca.addEventListener("click", () => { NOTIFS.length = 0; renderShade(); renderLock(); blip(520,.06); });
+  if (ca) ca.addEventListener("click", () => { if (Date.now() < S.suppressClickUntil) return; NOTIFS.length = 0; renderShade(); renderLock(); blip(520,.06); });
+  const gs = $("grabShade");
+  if (gs) gs.addEventListener("click", () => closeTopLayers());
   $("shade").querySelectorAll(".notif").forEach(n => n.addEventListener("click", () => {
+    if (Date.now() < S.suppressClickUntil) return;
     closeTopLayers();
     const map = {"Works":"works","Marksheet":"works","Contact (Demo)":"contact","Notes":"notes","System":"settings"};
     openApp(map[n.dataset.napp] || "works");
@@ -544,8 +603,11 @@ function renderCC(){
     tile("sleep","\u23FB","Sleep","Lock the device", false) +
     '<div class="cc-slider"><label>Brightness</label><input type="range" id="ccBright" min="30" max="100" value="' + Math.round(S.brightness*100) + '"></div>' +
     '<div class="cc-slider"><label>Volume</label><input type="range" id="ccVol" min="0" max="100" value="' + Math.round(S.volume*100) + '"></div>' +
-    "</div>";
-  const bind = (id, fn) => { const e = $("cc-" + id); if (e) e.addEventListener("click", fn); };
+    "</div>" +
+    '<button class="layer-grab" id="grabCc" aria-label="Close Control Center"><i></i></button>';
+  const gc = $("grabCc");
+  if (gc) gc.addEventListener("click", () => closeTopLayers());
+  const bind = (id, fn) => { const e = $("cc-" + id); if (e) e.addEventListener("click", () => { if (Date.now() < S.suppressClickUntil) return; fn(); }); };
   bind("plane", () => { S.airplane = !S.airplane; $("sbPlane").classList.toggle("hidden", !S.airplane); setCapsule(S.airplane ? "Airplane mode" : "TetaOS", S.airplane); renderCC(); blip(S.airplane?440:660,.06); });
   bind("dnd", () => { S.dnd = !S.dnd; renderCC(); });
   bind("flash", () => { toggleFlash(); renderCC(); });
@@ -566,19 +628,7 @@ function setCapsule(text, live){
   $("capsule").classList.toggle("live", !!live);
 }
 
-/* light theme overrides, scoped to the phone screen */
-(function(){
-  const st = document.createElement("style");
-  st.textContent =
-    "#screen.light{--panel:#ededf1;--panel2:#ffffff;--ink:#141416;--ink2:#55555e;--ink3:#83838c;--glass:rgba(0,0,0,.045);--hair:rgba(0,0,0,.10)}" +
-    "#screen.light .wallpaper{filter:brightness(1.9) saturate(.55)}" +
-    "#screen.light .notif{background:rgba(255,255,255,.65)}" +
-    "#screen.light .notif p{color:#333}" +
-    "#screen.light .appicon span{color:#141416;text-shadow:none}" +
-    "#screen.light .statusbar{color:#141416}" +
-    "#screen.light .term{background:#0a0a0a;color:#f5f5f5}";
-  document.head.appendChild(st);
-})();
+/* light theme overrides live in the main stylesheet (search: light theme) */
 </script>
 <script>
 "use strict";
@@ -686,15 +736,19 @@ function openApp(id, iconEl){
   const view = $("appview");
   view.innerHTML = appContent(id);
   attachApp(id);
+  const bb = $("appBack");
+  if (bb) bb.addEventListener("click", () => closeApp());
+  if (!S.appPushed){ try{ history.pushState({ tetaos: "app" }, ""); }catch(e){} S.appPushed = true; }
   view.classList.remove("hidden");
   appSpring.x = 0; appSpring.onUpdate(0);
   appSpring.setTarget(1);
   setCapsule(app.name, id === "terminal");
   blip(680,.05); haptic(8);
 }
-function closeApp(){
+function closeApp(fromPop){
   if (!S.currentApp) return;
   const id = S.currentApp; S.currentApp = null;
+  if (S.appPushed && !fromPop){ S.appPushed = false; try{ history.back(); }catch(e){} }
   appIconSnap = snapFromIcon(null, id);
   appSpring.onSettle = () => { $("appview").classList.add("hidden"); if (!S.locked) $("home").classList.remove("hidden"); setCapsule("TetaOS", false); };
   appSpring.setTarget(0);
@@ -706,6 +760,7 @@ function terminateApp(id){
     S.currentApp = null;
     $("appview").classList.add("hidden");
     setCapsule("TetaOS", false);
+    if (S.appPushed){ S.appPushed = false; try{ history.back(); }catch(e){} }
   }
   haptic(14); blip(300,.07);
 }
@@ -743,7 +798,7 @@ function attachCardGestures(card){
 /* ============ APP CONTENT (Phase 0 stubs with real pieces) ============ */
 function appContent(id){
   const a = appById(id);
-  const head = '<div class="app-head"><h2>' + a.name + '</h2><span class="micro">TetaOS 1.0</span></div><div class="app-body">';
+  const head = '<div class="app-head"><button class="back-btn" id="appBack" aria-label="Back to home screen"><b>&#8249;</b> Home</button><h2>' + a.name + '</h2><span class="micro">TetaOS 1.0</span></div><div class="app-body">';
   if (id === "works"){
     return head + PROJECTS.map(p =>
       '<div class="proj"><b>' + p[0] + '</b><div class="tags"><i>' + p[1] + '</i><i>Live site</i></div><p>' + p[2] + '</p></div>').join("") + "</div>";
@@ -880,8 +935,9 @@ screenEl.addEventListener("pointerdown", e => {
   G = { mode:null, sx:p.x, sy:p.y, x:p.x, y:p.y, lastT:now, lastMoveT:now,
         vx:0, vy:0, moved:0, topWhich:null, appDy:0, basePageX:0, holdTimer:null };
   if (topOpen){
-    if (p.y < 150){ G.mode = "topdrag"; const spr = topOpen === "shade" ? shadeSpring : ccSpring; spr.grab(); }
-    else { G = null; return; }
+    if (e.target.closest("input")){ G = null; return; }
+    G.mode = "topdrag"; G.startGrab = !!e.target.closest(".layer-grab");
+    const spr = topOpen === "shade" ? shadeSpring : ccSpring; spr.grab();
   }
   else if (S.locked){
     if (e.target.closest("#lock button")){ G = null; return; }
@@ -978,7 +1034,9 @@ function endGesture(){
   }
   else if (g.mode === "topdrag"){
     const spr = topOpen === "shade" ? shadeSpring : ccSpring, which = topOpen;
-    if (spr.x > 0.62 && g.vy > -1.1){ spr.setTarget(1); }
+    if (g.moved < 8 && g.startGrab){ topOpen = null; spr.onSettle = () => $(which).classList.add("hidden"); spr.setTarget(0); }
+    else if (g.moved < 8){ spr.setTarget(1); }
+    else if (spr.x > 0.8 || g.vy > 0.5){ spr.setTarget(1); }
     else { topOpen = null; spr.onSettle = () => $(which).classList.add("hidden"); spr.setTarget(0, clamp(g.vy * 900, -1400, 800)); }
   }
   else if (g.mode === "page"){
@@ -1003,6 +1061,20 @@ screenEl.addEventListener("contextmenu", e => e.preventDefault());
 $("homebar").addEventListener("click", () => {
   if (topOpen) closeTopLayers();
   else if (S.currentApp) closeApp();
+});
+/* Android hardware back / browser back: close the topmost TetaOS surface */
+window.addEventListener("popstate", () => {
+  if (topOpen){
+    closeTopLayers();
+    if (S.currentApp){ try{ history.pushState({ tetaos: "app" }, ""); }catch(e){} }
+    return;
+  }
+  if (!$("switcher").classList.contains("hidden")){
+    closeSwitcher();
+    if (S.currentApp){ try{ history.pushState({ tetaos: "app" }, ""); }catch(e){} }
+    return;
+  }
+  if (S.currentApp){ S.appPushed = false; closeApp(true); }
 });
 
 /* ============ BOOT ============ */
