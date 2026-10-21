@@ -799,9 +799,9 @@
               <!-- X-gen -->
               <div class="x-view" id="vXgen">
                 <h2>X-gen</h2>
-                <p class="x-micro">Viral X posts in full Naija style · 5 fresh posts daily</p>
+                <p class="x-micro">Viral X posts with true Nigerian humour · 5 fresh posts daily</p>
                 <div id="xgSetup">
-                  <p>Tell X-gen your corner of X. It will cook viral-style posts around your niche, in the Naija format that travels: sharp hook, relatable gist, small cruise, strong finish.</p>
+                  <p>Tell X-gen your corner of X. It writes posts around your niche the way Nigerians actually post: proper English, dry humour hiding inside normal observations, and no hard selling. Most posts read like everyday posts, because that is what travels.</p>
                   <label class="x-xg__lab" for="xgNiche">Your niche</label>
                   <input class="x-nsearch" id="xgNiche" type="text" placeholder="e.g. fitness coaching for busy bankers" autocomplete="off"/>
                   <label class="x-xg__lab" for="xgOffer">What you sell or offer</label>
@@ -810,12 +810,12 @@
                   <input class="x-nsearch" id="xgAudience" type="text" placeholder="e.g. Lagos 9-5 workers who hate the gym" autocomplete="off"/>
                   <label class="x-xg__lab" for="xgTone">Style</label>
                   <select class="x-xg__sel" id="xgTone">
-                    <option value="cruise">Naija cruise (funny, relatable)</option>
-                    <option value="wisdom">Naija wisdom (lessons and proverbs)</option>
-                    <option value="hot">Hot take (bold opinions)</option>
-                    <option value="story">Story style (gist format)</option>
+                    <option value="cruise">Everyday humour (funny, relatable)</option>
+                    <option value="wisdom">Quiet wisdom (lessons, steady truths)</option>
+                    <option value="hot">Bold takes (strong opinions)</option>
+                    <option value="story">Short stories (small everyday stories)</option>
                   </select>
-                  <button class="x-cta" id="xgSave" style="width:100%;margin-top:16px">Save and cook today's 5</button>
+                  <button class="x-cta" id="xgSave" style="width:100%;margin-top:16px">Save and generate today's 5</button>
                   <p class="x-micro" id="xgErr" role="alert"></p>
                 </div>
                 <div id="xgMain" hidden="">
@@ -2805,40 +2805,41 @@
       }
       window.postNotification = postNotification;
 
-      /* X-gen (Tools folder): viral X posts in full Naija style. The niche profile, the daily
+      /* X-gen (Tools folder): viral X posts in true Nigerian style: proper English,
+         subtle Nigerian humour inside normal posts, and only the occasional soft sell. The niche profile, the daily
          posts and the notification progress all persist in local storage. A fresh set of 5 is
          cooked every day; while TetaOS stays open the posts also arrive as notifications
          through the day, and the visitor can always ask for more inside the app. */
-      var XG_TONES = { cruise: "Naija cruise", wisdom: "Naija wisdom", hot: "Hot take", story: "Story style" };
+      var XG_TONES = { cruise: "Everyday humour", wisdom: "Quiet wisdom", hot: "Bold takes", story: "Short stories" };
       var XG_T = [
-        "Unpopular opinion: {niche} no hard. Na you dey make am hard because you dey copy people wey no resemble you.",
-        "Nobody dey talk this part of {niche}:\n\nThe thing wey go blow you no be new trick. Na the boring basics, done every single day.",
-        "If you be {audience}, stop scrolling.\n\nThat problem wey dey chop your money and time for {niche}? I go break am down for my next posts. Follow so you no go miss am.",
-        "Make I tell you something about {niche}.\n\nTalent no be problem. Na consistency be the real wahala. Small small, every day, e go show.",
-        "POV: you finally take {niche} serious for 90 days.\n\nNo noise. No shortcuts. Just work wey compound. Watch your life change shape.",
-        "As {audience}, the biggest scam na to wait for perfect time.\n\nPerfect time no dey come. Start with wetin dey your hand today.",
-        "Thread wey nobody ask for, but everybody need:\n\n5 mistakes wey dey kill your {niche} journey, and the simple fix for each one. Bookmark this one.",
-        "For {niche}, everybody wan go viral.\n\nMe, I wan build something wey go still dey pay me when the algorithm rest. That na the real game.",
-        "No be by mouth.\n\nIf your {niche} no dey show for your daily routine, e no go show for your results. Simple.",
-        "Small gist: the day I stop dey chase every trend for {niche}, na that day my own lane clear.\n\nFind your lane. Stay there. Grow there.",
-        "To every {audience} wey dey feel behind:\n\nyou no late. You just never start with structure. I dey share mine here, free. Follow and learn.",
-        "Hot take: most people no need more information about {niche}.\n\nDem need one clear plan and the discipline to follow am for 30 days.",
-        "Na why I dey offer {offer}.\n\nNo long talk. If e fit your situation, you go know. Check my pinned post and see for yourself.",
-        "Before you rush buy another course on {niche}, answer this one honestly:\n\nyou don finish the free one wey dey your phone since January?",
-        "The algorithm no hate you.\n\nYour hook just weak. For {niche}, the first line must hold neck. That na why I dey post daily lessons here.",
-        "Lessons from {niche} wey school no teach me:\n\n1. Show up before you feel ready.\n2. Document, no dey hide.\n3. Let results make the noise.",
-        "If {niche} dey confuse you, na because you dey learn from 20 people at once.\n\nPick one voice. Follow am well. Your head go calm.",
-        "Dem go laugh when you start.\n\nDem go ask how you do am when e start to show. Na so {niche} be. Keep going, my person.",
-        "Announcement for {audience}:\n\nI dey document my {niche} journey here, the wins and the wahala. If you wan learn without paying school fees of mistakes, follow along.",
-        "Real talk: {offer} no be for everybody.\n\nBut if you be {audience} wey don tire of trial and error for {niche}, e fit be exactly wetin you need."
+        "The most Nigerian thing ever is checking the price of something, converting it to what it cost in 2019, getting quietly angry, and buying it anyway.",
+        "Nobody warns you that adulting in Nigeria includes a monthly meeting with yourself about generator fuel, data subscription, and why your money finishes before your salary does.",
+        "Lagos traffic has produced more patient people than any motivational book ever written. You cannot rush what the Third Mainland Bridge has decided.",
+        "There is a special confidence Nigerians have when we say 'I am five minutes away.' Everyone involved understands it is a spiritual estimate, not a physical one.",
+        "The family WhatsApp group has two settings: total silence for three weeks, then 400 messages in one morning because somebody's child gained admission.",
+        "One quiet truth about {niche}: the people who last are rarely the loudest. They are the ones still doing the boring parts long after the excitement has gone home.",
+        "In this country, consistency has to survive power cuts, traffic and price surprises. If your {niche} routine only works on perfect days, it is not a routine yet.",
+        "Slow progress embarrasses no one. The people smiling at your small start in {niche} will quietly ask how you did it when it starts to show.",
+        "An elder will tell you 'it is well' in a situation that is visibly not well. Underneath it is a real skill: staying steady while you fix what you can.",
+        "Document your {niche} journey, even the unglamorous parts. One day the same photos you almost deleted will be the proof that the work was real.",
+        "Unpopular opinion for {audience}: most people do not need more information about {niche}. They need one clear plan and the discipline to follow it for 30 days without shopping for a second opinion.",
+        "Hot take: if your {niche} only works when motivation is high, the system is the problem, not your character. Design it for your tired days, not your best days.",
+        "People say Nigerians are too impatient for long-term things, then quietly build houses over seven years, one block at a time. We understand compounding. We just like to complain while doing it.",
+        "The algorithm is not your enemy. In {niche}, a weak first line is. People scroll past in one second, and we blame technology for a sentence.",
+        "Stop learning {niche} from twenty people at once. Pick one voice, follow it properly for a season, and let your head rest. Confusion is often just too many teachers.",
+        "Small story: a danfo conductor once returned my change before I asked, in Lagos, during rush hour. I have thought about that honesty at least once a month since. Character shows in small traffic too.",
+        "Years ago I watched a trader in Balogun market wrap a customer's goods in the rain like she was handling something precious. Pride in small work. Whatever your {niche} is, that spirit translates.",
+        "My neighbour starts her generator the exact minute power goes, every single time, like she was waiting by the switch. Say what you like about this country, we are never caught unprepared twice.",
+        "At an owambe last month, the small chops finished before the couple even entered. Nobody panicked. Two aunties produced backup trays from absolutely nowhere. Nigerians always have a Plan B, and usually a Plan C selling pure water nearby.",
+        "A soft note, since some of you asked: I help people with {offer}. No pressure and no long pitch here. If it fits your situation, my pinned post explains it better than one post can."
       ];
-      var XG_TONE_IDX = { cruise: [1, 8, 13, 18], wisdom: [3, 5, 10, 15], hot: [0, 6, 11, 14], story: [4, 9, 16, 17] };
+      var XG_TONE_IDX = { cruise: [0, 1, 2, 3, 4], wisdom: [5, 6, 7, 8, 9], hot: [10, 11, 12, 13, 14], story: [15, 16, 17, 18, 19] };
       function xgDay() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
       function xgSeed(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return function () { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
       function xgProfile() { return store.get("xgProfile"); }
       function xgFill(t, p) {
         var niche = (p.niche || "your niche").trim(), offer = (p.offer || "").trim(), aud = (p.audience || "").trim();
-        return t.split("{niche}").join(niche).split("{offer}").join(offer || niche).split("{audience}").join(aud || "anybody wey dey build for " + niche);
+        return t.split("{niche}").join(niche).split("{offer}").join(offer || niche).split("{audience}").join(aud || "anyone building something real in " + niche);
       }
       function xgCook(n, extraSeed) {
         var p = xgProfile(); if (!p) return [];
@@ -2847,7 +2848,8 @@
         var all = XG_T.map(function (_, i) { return i; });
         var head = shuf(XG_TONE_IDX[p.tone] || []);
         var rest = shuf(all.filter(function (i) { return head.indexOf(i) < 0; }));
-        return head.concat(rest).slice(0, n).map(function (i) { return xgFill(XG_T[i], p); });
+        var lead = head.slice(0, 3), pool = shuf(head.slice(3).concat(rest));
+        return lead.concat(pool).slice(0, n).map(function (i) { return xgFill(XG_T[i], p); });
       }
       function xgEnsure(fresh) {
         var p = xgProfile(); if (!p) return null;
@@ -2856,7 +2858,7 @@
         if (!st || st.day !== xgDay() || !st.posts || !st.posts.length) {
           st = { day: xgDay(), posts: xgCook(5), sent: 0, nextPing: Date.now() + 60000, src: "tpl", aiTried: false };
           store.set("xgState", st);
-          if (fresh) postNotification("X-gen", "Your 5 posts for today don land", "Fresh Naija-style posts for " + p.niche + ". Tap to view, copy and post.", nsOpenApp("X-gen"));
+          if (fresh) postNotification("X-gen", "Your 5 posts for today are ready", "Fresh posts in true Nigerian style for " + p.niche + ". Tap to view, copy and post.", nsOpenApp("X-gen"));
         }
         return st;
       }
@@ -2875,12 +2877,12 @@
          (window.TETA_AI from ai-config.js, set in Dokploy), the model writes the daily set
          and the extra posts instead. The templates stay as the instant first paint and the
          silent fallback: any failure flips the shared aiDead flag and nobody sees a thing. */
-      var XG_AI_SYS = "You write viral posts for X (Twitter) for one creator, in the well known Nigerian Naija X style: a sharp first-line hook, relatable gist, light pidgin where it lands naturally, and a confident finish. Plain text only. No hashtags unless one truly fits. No emojis unless one truly fits. Never use the em dash character; use commas or short sentences instead. Every post must stand alone, be under 280 characters, and read like something a real Naija creator would post, not an advert.";
+      var XG_AI_SYS = "You write posts for X (Twitter) for one creator, the way Nigerians actually post. Rules: write in proper English at all times, never pidgin. The humour must be distinctly Nigerian but subtle and dry, the almost unseen kind that Nigerians recognise instantly: everyday frustrations told straight, like traffic that makes its own decisions, power cuts, prices remembered from years ago, family WhatsApp groups and owambe logistics, all delivered like a normal observation rather than a joke with a punchline. Most posts must be ordinary posts a real person would make: an observation, a dry take, a small story, a question. At most one post in five may softly mention what the creator offers, and even that one must not read like an advert. No hashtags unless one truly fits. No emojis unless one truly fits. Never use the em dash character; use commas or short sentences instead. Every post must stand alone and be under 280 characters.";
       var xgAiBusy = false;
       function xgAiUserText(p, n, existing) {
-        var t = "Creator niche: " + p.niche + ". What they offer: " + (p.offer || p.niche) + ". Audience: " + (p.audience || "their followers") + ". Style: " + (XG_TONES[p.tone] || "Naija cruise") + ". ";
-        if (existing) t += "Write 1 more post, different in wording and angle from these earlier ones: " + existing.join(" | ") + ". Reply with only that one post, nothing else.";
-        else t += "Write " + n + " different posts for today. Vary the formats: one hot take, one relatable gist, one lesson, one question that invites replies, one soft pitch for the offer. Separate the " + n + " posts with a line that contains only %%% and nothing else. No numbering, no intro, no closing line.";
+        var t = "Creator niche: " + p.niche + ". What they offer: " + (p.offer || p.niche) + ". Audience: " + (p.audience || "their followers") + ". Style: " + (XG_TONES[p.tone] || "Everyday humour") + ". ";
+        if (existing) t += "Write 1 more post, different in wording and angle from these earlier ones, and keep it a normal everyday post rather than a sales pitch: " + existing.join(" | ") + ". Reply with only that one post, nothing else.";
+        else t += "Write " + n + " posts for today. Make most of them normal posts: an everyday observation, a dry-humoured take, a small story, a question people actually reply to. At most one may softly mention the offer; the rest must not sell anything at all. Separate the " + n + " posts with a line that contains only %%% and nothing else. No numbering, no intro, no closing line.";
         return t;
       }
       function xgAiFetch(userText, maxTokens, done) {
@@ -2932,7 +2934,7 @@
           return;
         }
         var st = xgEnsure(false); if (!st) return;
-        $("xgToday").textContent = "Today's posts · " + st.posts.length + " ready · " + (XG_TONES[p.tone] || "Naija cruise") + " · " + p.niche + (st.src === "ai" ? " · written by AI" : "");
+        $("xgToday").textContent = "Today's posts · " + st.posts.length + " ready · " + (XG_TONES[p.tone] || "Everyday humour") + " · " + p.niche + (st.src === "ai" ? " · written by AI" : "");
         xgAiUpgrade();
         var list = $("xgList"); list.replaceChildren();
         st.posts.forEach(function (text) { list.appendChild(xgCard(text)); });
@@ -2960,7 +2962,7 @@
         store.set("xgProfile", { niche: niche, offer: $("xgOffer").value.trim(), audience: $("xgAudience").value.trim(), tone: $("xgTone").value });
         xgEditing = false;
         var st = store.get("xgState"); if (st) { st.day = ""; store.set("xgState", st); }
-        xgEnsure(true); xgRender(); sysToast("X-gen is cooking");
+        xgEnsure(true); xgRender(); sysToast("X-gen is writing");
       });
       $("xgMore").addEventListener("click", function () {
         var st = xgEnsure(false); if (!st || xgAiBusy) return;
