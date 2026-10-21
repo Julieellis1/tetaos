@@ -2852,8 +2852,9 @@
       function xgEnsure(fresh) {
         var p = xgProfile(); if (!p) return null;
         var st = store.get("xgState");
+        if (st && st.day === xgDay() && !st.src) { st.src = "tpl"; st.aiTried = false; store.set("xgState", st); }
         if (!st || st.day !== xgDay() || !st.posts || !st.posts.length) {
-          st = { day: xgDay(), posts: xgCook(5), sent: 0, nextPing: Date.now() + 60000 };
+          st = { day: xgDay(), posts: xgCook(5), sent: 0, nextPing: Date.now() + 60000, src: "tpl", aiTried: false };
           store.set("xgState", st);
           if (fresh) postNotification("X-gen", "Your 5 posts for today don land", "Fresh Naija-style posts for " + p.niche + ". Tap to view, copy and post.", nsOpenApp("X-gen"));
         }
@@ -2862,6 +2863,7 @@
       function xgPing() {
         if (locked || document.hidden || state.dnd) return;
         var st = xgEnsure(true); if (!st) return;
+        xgAiUpgrade();
         if (st.sent < st.posts.length && Date.now() >= (st.nextPing || 0)) {
           var text = st.posts[st.sent];
           st.sent++; st.nextPing = Date.now() + 3600000; store.set("xgState", st);
@@ -2869,6 +2871,58 @@
         }
       }
       setInterval(xgPing, 30000);
+      /* X-gen on AI: when the same TETA_AI config as the Contact front desk is present
+         (window.TETA_AI from ai-config.js, set in Dokploy), the model writes the daily set
+         and the extra posts instead. The templates stay as the instant first paint and the
+         silent fallback: any failure flips the shared aiDead flag and nobody sees a thing. */
+      var XG_AI_SYS = "You write viral posts for X (Twitter) for one creator, in the well known Nigerian Naija X style: a sharp first-line hook, relatable gist, light pidgin where it lands naturally, and a confident finish. Plain text only. No hashtags unless one truly fits. No emojis unless one truly fits. Never use the em dash character; use commas or short sentences instead. Every post must stand alone, be under 280 characters, and read like something a real Naija creator would post, not an advert.";
+      var xgAiBusy = false;
+      function xgAiUserText(p, n, existing) {
+        var t = "Creator niche: " + p.niche + ". What they offer: " + (p.offer || p.niche) + ". Audience: " + (p.audience || "their followers") + ". Style: " + (XG_TONES[p.tone] || "Naija cruise") + ". ";
+        if (existing) t += "Write 1 more post, different in wording and angle from these earlier ones: " + existing.join(" | ") + ". Reply with only that one post, nothing else.";
+        else t += "Write " + n + " different posts for today. Vary the formats: one hot take, one relatable gist, one lesson, one question that invites replies, one soft pitch for the offer. Separate the " + n + " posts with a line that contains only %%% and nothing else. No numbering, no intro, no closing line.";
+        return t;
+      }
+      function xgAiFetch(userText, maxTokens, done) {
+        if (!aiCfg || aiDead) return done(null);
+        var ctl = window.AbortController ? new AbortController() : null;
+        var to = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : 0;
+        fetch(aiCfg.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + aiCfg.apiKey },
+          body: JSON.stringify({ model: aiCfg.model, messages: [{ role: "system", content: XG_AI_SYS }, { role: "user", content: userText }], max_tokens: maxTokens, temperature: 0.9 }),
+          signal: ctl ? ctl.signal : undefined
+        }).then(function (r) { if (!r.ok) throw new Error("ai"); return r.json(); })
+          .then(function (j) {
+            clearTimeout(to);
+            var txt = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+            var posts = String(txt).split("%%%").map(function (s) { return s.replace(/^\s*\d+[.)]\s*/, "").trim(); }).filter(function (s) { return s.length >= 20 && s.length <= 280; });
+            if (!posts.length) throw new Error("ai");
+            done(posts);
+          }).catch(function () { clearTimeout(to); aiDead = true; done(null); });
+      }
+      function xgAiUpgrade() {
+        var p = xgProfile(); if (!p || !aiCfg || aiDead || xgAiBusy) return;
+        var st = store.get("xgState");
+        if (!st || st.day !== xgDay() || st.src !== "tpl" || st.aiTried || st.sent > 0) return;
+        st.aiTried = true; store.set("xgState", st);
+        xgAiBusy = true;
+        xgAiFetch(xgAiUserText(p, 5, null), 700, function (posts) {
+          xgAiBusy = false;
+          if (!posts) return;
+          var cur = store.get("xgState");
+          if (!cur || cur.day !== xgDay() || cur.src !== "tpl" || cur.sent > 0) return;
+          var tpl = xgCook(5), guard = 0;
+          while (posts.length < 5 && guard++ < 5) posts.push(tpl[posts.length % tpl.length]);
+          cur.posts = posts.slice(0, 5); cur.src = "ai"; store.set("xgState", cur);
+          if (app.dataset.cur === "X-gen" && !xgEditing) xgRender();
+        });
+      }
+      function xgTplExtra(st) {
+        var extra = xgCook(8, "x" + st.posts.length + "|" + Date.now());
+        return extra.filter(function (t) { return st.posts.indexOf(t) < 0; })[0] || extra[0];
+      }
+
       var xgEditing = false;
       function xgRender() {
         var p = xgProfile(), showSetup = !p || xgEditing;
@@ -2878,7 +2932,8 @@
           return;
         }
         var st = xgEnsure(false); if (!st) return;
-        $("xgToday").textContent = "Today's posts · " + st.posts.length + " ready · " + (XG_TONES[p.tone] || "Naija cruise") + " · " + p.niche;
+        $("xgToday").textContent = "Today's posts · " + st.posts.length + " ready · " + (XG_TONES[p.tone] || "Naija cruise") + " · " + p.niche + (st.src === "ai" ? " · written by AI" : "");
+        xgAiUpgrade();
         var list = $("xgList"); list.replaceChildren();
         st.posts.forEach(function (text) { list.appendChild(xgCard(text)); });
       }
@@ -2908,10 +2963,18 @@
         xgEnsure(true); xgRender(); sysToast("X-gen is cooking");
       });
       $("xgMore").addEventListener("click", function () {
-        var st = xgEnsure(false); if (!st) return;
-        var extra = xgCook(8, "x" + st.posts.length + "|" + Date.now());
-        var add = extra.filter(function (t) { return st.posts.indexOf(t) < 0; })[0] || extra[0];
-        st.posts.push(add); store.set("xgState", st); xgRender();
+        var st = xgEnsure(false); if (!st || xgAiBusy) return;
+        var p = xgProfile();
+        if (aiCfg && !aiDead && p) {
+          xgAiBusy = true;
+          xgAiFetch(xgAiUserText(p, 1, st.posts.slice()), 160, function (posts) {
+            xgAiBusy = false;
+            var cur = store.get("xgState"); if (!cur) return;
+            var add = posts && posts.filter(function (t) { return cur.posts.indexOf(t) < 0; })[0];
+            if (!add) add = xgTplExtra(cur);
+            cur.posts.push(add); store.set("xgState", cur); xgRender();
+          });
+        } else { st.posts.push(xgTplExtra(st)); store.set("xgState", st); xgRender(); }
       });
       $("xgPing").addEventListener("click", function () {
         var st = xgEnsure(false); if (!st || !st.posts.length) return;
