@@ -162,6 +162,11 @@
       .x-gf .x-gf__p { background: var(--c-bg); color: var(--c-text); }
       .x-gf__p h3 { margin: 0 0 18px; text-align: center; font-weight: 500; }
       .x-gf__p .x-grid { grid-template-columns: repeat(2, 1fr); margin: 0; }
+.x-xg__post { padding: 14px 16px; margin-top: 10px; }
+.x-xg__post p { margin: 0 0 10px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.x-xg__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.x-xg__lab { display: block; margin: 14px 0 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.x-xg__sel { width: 100%; min-height: 44px; margin-top: 8px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--c-line); background: var(--c-solid); color: var(--c-text); font: inherit; font-size: 15px; outline: none; }
       .x-hol__top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
       .x-hol__main { display: grid; grid-template-columns: 34px 1fr; gap: 16px; margin-top: 18px; }
       .x-rail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column-reverse; gap: 4px; border-left: 2px solid var(--c-line); }
@@ -670,6 +675,7 @@
               </div>
               <div class="x-dock x-glass" id="dock"></div>
               <div class="x-gf" id="gFolder" hidden=""><div class="x-gf__p x-glass" role="dialog" aria-label="Games folder"><h3>Games</h3><div class="x-grid" id="gGrid"></div></div></div>
+              <div class="x-gf" id="tFolder" hidden=""><div class="x-gf__p x-glass" role="dialog" aria-label="Tools folder"><h3>Tools</h3><div class="x-grid" id="tGrid"></div></div></div>
             </div>
 
             <!-- App window -->
@@ -787,6 +793,40 @@
                   <p class="x-swd" id="swD">00:00.00</p>
                   <div class="x-swb"><button class="x-pill" id="swLap">Lap</button><button class="x-pill" id="swGo">Start</button><button class="x-pill" id="swRe">Reset</button></div>
                   <ol class="x-laps" id="swLaps"></ol>
+                </div>
+              </div>
+
+              <!-- X-gen -->
+              <div class="x-view" id="vXgen">
+                <h2>X-gen</h2>
+                <p class="x-micro">Viral X posts in full Naija style · 5 fresh posts daily</p>
+                <div id="xgSetup">
+                  <p>Tell X-gen your corner of X. It will cook viral-style posts around your niche, in the Naija format that travels: sharp hook, relatable gist, small cruise, strong finish.</p>
+                  <label class="x-xg__lab" for="xgNiche">Your niche</label>
+                  <input class="x-nsearch" id="xgNiche" type="text" placeholder="e.g. fitness coaching for busy bankers" autocomplete="off"/>
+                  <label class="x-xg__lab" for="xgOffer">What you sell or offer</label>
+                  <input class="x-nsearch" id="xgOffer" type="text" placeholder="e.g. 6-week home workout plans" autocomplete="off"/>
+                  <label class="x-xg__lab" for="xgAudience">Your audience</label>
+                  <input class="x-nsearch" id="xgAudience" type="text" placeholder="e.g. Lagos 9-5 workers who hate the gym" autocomplete="off"/>
+                  <label class="x-xg__lab" for="xgTone">Style</label>
+                  <select class="x-xg__sel" id="xgTone">
+                    <option value="cruise">Naija cruise (funny, relatable)</option>
+                    <option value="wisdom">Naija wisdom (lessons and proverbs)</option>
+                    <option value="hot">Hot take (bold opinions)</option>
+                    <option value="story">Story style (gist format)</option>
+                  </select>
+                  <button class="x-cta" id="xgSave" style="width:100%;margin-top:16px">Save and cook today's 5</button>
+                  <p class="x-micro" id="xgErr" role="alert"></p>
+                </div>
+                <div id="xgMain" hidden="">
+                  <div class="x-xg__row" style="margin-top:14px">
+                    <button class="x-pill" id="xgMore">Give me another one</button>
+                    <button class="x-pill" id="xgPing">Send as notification</button>
+                    <button class="x-pill" id="xgEdit">Edit niche</button>
+                  </div>
+                  <p class="x-micro" id="xgToday" style="margin-top:14px">Today's posts</p>
+                  <div id="xgList"></div>
+                  <p class="x-micro" style="margin-top:14px">A fresh set of 5 drops every day. While TetaOS stays open, X-gen also delivers your posts as notifications through the day. Tap Post on X to share one.</p>
                 </div>
               </div>
 
@@ -1224,9 +1264,11 @@
         "Higher or Lower": '<path d="m7 10 5-5 5 5M7 14l5 5 5-5"/>',
         Tetris: '<path d="M4 9h12v5H4zM8 14h4v5H8zM16 9h4v5h-4"/>',
         Snake: '<path d="M4 18h9a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h10"/><circle cx="19" cy="6" r="1"/>',
-        "X & O": '<path d="m4 4 6 6m0-6-6 6"/><circle cx="17" cy="17" r="3.5"/><path d="M12 3v18M3 12h18"/>'
+        "X & O": '<path d="m4 4 6 6m0-6-6 6"/><circle cx="17" cy="17" r="3.5"/><path d="M12 3v18M3 12h18"/>',
+        "X-gen": '<path d="M5 5l14 14M19 5L5 19"/>'
       };
       var GAMES = ["Higher or Lower", "Tetris", "Snake", "X & O"];
+      var TOOLS = ["X-gen"];
       function icon(name) {
         var b = document.createElement("button");
         b.className = "x-icon"; b.dataset.app = name; b.setAttribute("aria-label", name);
@@ -1234,6 +1276,7 @@
         b.addEventListener("click", function () {
           var sq = b.querySelector(".x-sq"); openApp(name, sq);
           if (GAMES.indexOf(name) >= 0) { fromEl = $("gFold"); gfClose(); }
+          if (TOOLS.indexOf(name) >= 0) { fromEl = $("tFold"); tfClose(); }
         });
         return b;
       }
@@ -1253,6 +1296,17 @@
         $("gFolder").addEventListener("click", function (e) { if (Date.now() - gfAt < 300) return; if (!e.target.closest(".x-gf__p")) gfClose(); });
       })();
       function gfClose() { var f = $("gFolder"); f.classList.remove("is-on"); setTimeout(function () { if (!f.classList.contains("is-on")) f.hidden = true; }, 250); }
+      (function () {
+        var b = document.createElement("button");
+        b.className = "x-icon"; b.setAttribute("aria-label", "Tools folder");
+        b.innerHTML = '<span class="x-sq x-glass x-fold" id="tFold">' + TOOLS.map(function (g) { return '<svg viewBox="0 0 24 24">' + P[g] + "</svg>"; }).join("") + "</span><span>Tools</span>";
+        var tfAt = 0;
+        b.addEventListener("click", function (e) { e.stopPropagation(); var f = $("tFolder"); tfAt = Date.now(); f.hidden = false; requestAnimationFrame(function () { void f.offsetWidth; f.classList.add("is-on"); }); });
+        $("grid").appendChild(b);
+        TOOLS.forEach(function (n) { $("tGrid").appendChild(icon(n)); });
+        $("tFolder").addEventListener("click", function (e) { if (Date.now() - tfAt < 300) return; if (!e.target.closest(".x-gf__p")) tfClose(); });
+      })();
+      function tfClose() { var f = $("tFolder"); f.classList.remove("is-on"); setTimeout(function () { if (!f.classList.contains("is-on")) f.hidden = true; }, 250); }
       ["Works","Terminal","Camera","Contact"].forEach(function (n) { $("dock").appendChild(icon(n)); });
 
       /* Deep links: ?app=<id>[&project=<slug>][&cmd=<command>] */
@@ -1350,7 +1404,7 @@
         return "translate(" + r.x + "px," + r.y + "px) scale(" + (r.w / W) + "," + (r.h / H) + ")";
       }
       function openApp(name, sq) {
-        if (!sq || !sq.offsetWidth) sq = GAMES.indexOf(name) >= 0 ? $("gFold") : sq || $("gFold");
+        if (!sq || !sq.offsetWidth) sq = GAMES.indexOf(name) >= 0 ? $("gFold") : TOOLS.indexOf(name) >= 0 ? $("tFold") : sq || $("gFold");
         fromEl = sq; $("appSoon").textContent = GAMES.indexOf(name) > 0 ? "Coming in the next update" : "Arriving in the next update";
         $("appName").textContent = name;
         $("appIc").innerHTML = '<svg viewBox="0 0 24 24">' + P[name] + "</svg>";
@@ -1568,9 +1622,11 @@
         if (name === "Photos") phRender();
         if (!alive && name === "Files") { fCwd = []; $("fEd").classList.remove("is-open"); }
         if (name === "Files") fRender();
+        if (name === "X-gen") xgRender();
         if (name === "Tetris") tbShow();
         if (name === "Snake") snShow();
       }
+      views["X-gen"] = $("vXgen");
       views["Higher or Lower"] = $("vHol");
       views.Tetris = $("vTb");
       views.Snake = $("vSn");
@@ -2749,14 +2805,127 @@
       }
       window.postNotification = postNotification;
 
-      /* Incoming call easter egg: after 2 min unlocked, once per session and once per day */
-      var callEl = $("call"), callT = 0, callTone = 0, callUp = 0, callDone = false;
-      var callStage = 1, call2Up = 0, call2Done = false, callAudio = null;
-      try { callDone = sessionStorage.getItem("tetaos:call") === "1"; } catch (e) {}
-      try { call2Done = sessionStorage.getItem("tetaos:call2") === "1"; } catch (e) {}
-      function callDay() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
-      if (store.get("callDay") === callDay()) callDone = true;
-      if (store.get("call2Day") === callDay()) call2Done = true;
+      /* X-gen (Tools folder): viral X posts in full Naija style. The niche profile, the daily
+         posts and the notification progress all persist in local storage. A fresh set of 5 is
+         cooked every day; while TetaOS stays open the posts also arrive as notifications
+         through the day, and the visitor can always ask for more inside the app. */
+      var XG_TONES = { cruise: "Naija cruise", wisdom: "Naija wisdom", hot: "Hot take", story: "Story style" };
+      var XG_T = [
+        "Unpopular opinion: {niche} no hard. Na you dey make am hard because you dey copy people wey no resemble you.",
+        "Nobody dey talk this part of {niche}:\n\nThe thing wey go blow you no be new trick. Na the boring basics, done every single day.",
+        "If you be {audience}, stop scrolling.\n\nThat problem wey dey chop your money and time for {niche}? I go break am down for my next posts. Follow so you no go miss am.",
+        "Make I tell you something about {niche}.\n\nTalent no be problem. Na consistency be the real wahala. Small small, every day, e go show.",
+        "POV: you finally take {niche} serious for 90 days.\n\nNo noise. No shortcuts. Just work wey compound. Watch your life change shape.",
+        "As {audience}, the biggest scam na to wait for perfect time.\n\nPerfect time no dey come. Start with wetin dey your hand today.",
+        "Thread wey nobody ask for, but everybody need:\n\n5 mistakes wey dey kill your {niche} journey, and the simple fix for each one. Bookmark this one.",
+        "For {niche}, everybody wan go viral.\n\nMe, I wan build something wey go still dey pay me when the algorithm rest. That na the real game.",
+        "No be by mouth.\n\nIf your {niche} no dey show for your daily routine, e no go show for your results. Simple.",
+        "Small gist: the day I stop dey chase every trend for {niche}, na that day my own lane clear.\n\nFind your lane. Stay there. Grow there.",
+        "To every {audience} wey dey feel behind:\n\nyou no late. You just never start with structure. I dey share mine here, free. Follow and learn.",
+        "Hot take: most people no need more information about {niche}.\n\nDem need one clear plan and the discipline to follow am for 30 days.",
+        "Na why I dey offer {offer}.\n\nNo long talk. If e fit your situation, you go know. Check my pinned post and see for yourself.",
+        "Before you rush buy another course on {niche}, answer this one honestly:\n\nyou don finish the free one wey dey your phone since January?",
+        "The algorithm no hate you.\n\nYour hook just weak. For {niche}, the first line must hold neck. That na why I dey post daily lessons here.",
+        "Lessons from {niche} wey school no teach me:\n\n1. Show up before you feel ready.\n2. Document, no dey hide.\n3. Let results make the noise.",
+        "If {niche} dey confuse you, na because you dey learn from 20 people at once.\n\nPick one voice. Follow am well. Your head go calm.",
+        "Dem go laugh when you start.\n\nDem go ask how you do am when e start to show. Na so {niche} be. Keep going, my person.",
+        "Announcement for {audience}:\n\nI dey document my {niche} journey here, the wins and the wahala. If you wan learn without paying school fees of mistakes, follow along.",
+        "Real talk: {offer} no be for everybody.\n\nBut if you be {audience} wey don tire of trial and error for {niche}, e fit be exactly wetin you need."
+      ];
+      var XG_TONE_IDX = { cruise: [1, 8, 13, 18], wisdom: [3, 5, 10, 15], hot: [0, 6, 11, 14], story: [4, 9, 16, 17] };
+      function xgDay() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+      function xgSeed(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return function () { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
+      function xgProfile() { return store.get("xgProfile"); }
+      function xgFill(t, p) {
+        var niche = (p.niche || "your niche").trim(), offer = (p.offer || "").trim(), aud = (p.audience || "").trim();
+        return t.split("{niche}").join(niche).split("{offer}").join(offer || niche).split("{audience}").join(aud || "anybody wey dey build for " + niche);
+      }
+      function xgCook(n, extraSeed) {
+        var p = xgProfile(); if (!p) return [];
+        var rnd = xgSeed(xgDay() + "|" + p.niche + "|" + p.tone + "|" + (extraSeed || ""));
+        function shuf(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+        var all = XG_T.map(function (_, i) { return i; });
+        var head = shuf(XG_TONE_IDX[p.tone] || []);
+        var rest = shuf(all.filter(function (i) { return head.indexOf(i) < 0; }));
+        return head.concat(rest).slice(0, n).map(function (i) { return xgFill(XG_T[i], p); });
+      }
+      function xgEnsure(fresh) {
+        var p = xgProfile(); if (!p) return null;
+        var st = store.get("xgState");
+        if (!st || st.day !== xgDay() || !st.posts || !st.posts.length) {
+          st = { day: xgDay(), posts: xgCook(5), sent: 0, nextPing: Date.now() + 60000 };
+          store.set("xgState", st);
+          if (fresh) postNotification("X-gen", "Your 5 posts for today don land", "Fresh Naija-style posts for " + p.niche + ". Tap to view, copy and post.", nsOpenApp("X-gen"));
+        }
+        return st;
+      }
+      function xgPing() {
+        if (locked || document.hidden || state.dnd) return;
+        var st = xgEnsure(true); if (!st) return;
+        if (st.sent < st.posts.length && Date.now() >= (st.nextPing || 0)) {
+          var text = st.posts[st.sent];
+          st.sent++; st.nextPing = Date.now() + 3600000; store.set("xgState", st);
+          postNotification("X-gen", "Post " + st.sent + " of " + st.posts.length + " for today", text, nsOpenApp("X-gen"));
+        }
+      }
+      setInterval(xgPing, 30000);
+      var xgEditing = false;
+      function xgRender() {
+        var p = xgProfile(), showSetup = !p || xgEditing;
+        $("xgSetup").hidden = !showSetup; $("xgMain").hidden = showSetup;
+        if (showSetup) {
+          if (p) { $("xgNiche").value = p.niche || ""; $("xgOffer").value = p.offer || ""; $("xgAudience").value = p.audience || ""; $("xgTone").value = p.tone || "cruise"; }
+          return;
+        }
+        var st = xgEnsure(false); if (!st) return;
+        $("xgToday").textContent = "Today's posts · " + st.posts.length + " ready · " + (XG_TONES[p.tone] || "Naija cruise") + " · " + p.niche;
+        var list = $("xgList"); list.replaceChildren();
+        st.posts.forEach(function (text) { list.appendChild(xgCard(text)); });
+      }
+      function xgCard(text) {
+        var d = document.createElement("div"); d.className = "x-sg x-glass x-xg__post";
+        var p = document.createElement("p"); p.textContent = text; d.appendChild(p);
+        var row = document.createElement("div"); row.className = "x-xg__row";
+        var cp = document.createElement("button"); cp.className = "x-pill"; cp.textContent = "Copy post";
+        cp.addEventListener("click", function () { xgCopy(text); });
+        var sh = document.createElement("button"); sh.className = "x-pill"; sh.textContent = "Post on X";
+        sh.addEventListener("click", function () { leave("https://twitter.com/intent/tweet?text=" + encodeURIComponent(text)); });
+        row.appendChild(cp); row.appendChild(sh); d.appendChild(row);
+        return d;
+      }
+      function xgCopyFb(text) { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} ta.remove(); }
+      function xgCopy(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { sysToast("Post copied"); }, function () { xgCopyFb(text); sysToast("Post copied"); });
+        else { xgCopyFb(text); sysToast("Post copied"); }
+      }
+      $("xgSave").addEventListener("click", function () {
+        var niche = $("xgNiche").value.trim();
+        if (!niche) { $("xgErr").textContent = "Tell X-gen your niche first, e.g. fitness coaching for busy bankers."; $("xgNiche").focus(); return; }
+        $("xgErr").textContent = "";
+        store.set("xgProfile", { niche: niche, offer: $("xgOffer").value.trim(), audience: $("xgAudience").value.trim(), tone: $("xgTone").value });
+        xgEditing = false;
+        var st = store.get("xgState"); if (st) { st.day = ""; store.set("xgState", st); }
+        xgEnsure(true); xgRender(); sysToast("X-gen is cooking");
+      });
+      $("xgMore").addEventListener("click", function () {
+        var st = xgEnsure(false); if (!st) return;
+        var extra = xgCook(8, "x" + st.posts.length + "|" + Date.now());
+        var add = extra.filter(function (t) { return st.posts.indexOf(t) < 0; })[0] || extra[0];
+        st.posts.push(add); store.set("xgState", st); xgRender();
+      });
+      $("xgPing").addEventListener("click", function () {
+        var st = xgEnsure(false); if (!st || !st.posts.length) return;
+        postNotification("X-gen", "Today's posts", st.posts[0], nsOpenApp("X-gen"));
+      });
+      $("xgEdit").addEventListener("click", function () { xgEditing = true; xgRender(); });
+
+      /* Incoming call: rings every minute until the visitor accepts. Acceptance is saved in
+         local storage, so an accepted call never rings again on this device. The referral
+         call (call 2) only starts once call 1 has been accepted, and also repeats every
+         minute until it is accepted. */
+      var callEl = $("call"), callT = 0, callTone = 0, callUp = 0;
+      var callStage = 1, call2Up = 0, callAudio = null;
+      var call1Ok = !!store.get("call1Accepted"), call2Ok = !!store.get("call2Accepted");
       function ringOnce() {
         if (state.mute) return;
         try {
@@ -2782,8 +2951,6 @@
       function callRing(stage) {
         callStage = stage;
         callAudio = stage === 2 ? call2Voice : callVoice;
-        if (stage === 2) { call2Done = true; store.set("call2Day", callDay()); try { sessionStorage.setItem("tetaos:call2", "1"); } catch (e) {} }
-        else { callDone = true; store.set("callDay", callDay()); try { sessionStorage.setItem("tetaos:call", "1"); } catch (e) {} }
         var h = $("home") && getComputedStyle($("home")).backgroundImage;
         $("callBg").style.backgroundImage = h && h !== "none" ? h : "";
         callEl.setAttribute("aria-hidden", "false"); void callEl.offsetWidth; callEl.classList.add("is-on");
@@ -2792,11 +2959,12 @@
         callT = setTimeout(callEnd, 20000);
         setTimeout(function () { if (callEl.classList.contains("is-on")) $("callYes").focus({ preventScroll: true }); }, 600);
       }
-      /* Call 1 after 2 min unlocked; the referral call 2 follows 3 min after call 1 in the same session. Each rings at most once a day. */
+      /* One eligible minute between rings: decline it or let it ring out and it comes back
+         a minute later. Only accepting a call stops its rings, for good, on this device. */
       setInterval(function () {
         if (locked || document.hidden || state.dnd || $("pinPad").classList.contains("is-on") || callEl.classList.contains("is-on") || acOpen) return;
-        if (!callDone) { if (++callUp >= 120) callRing(1); }
-        else if (!call2Done) { if (++call2Up >= 180) callRing(2); }
+        if (!call1Ok) { if (++callUp >= 60) { callUp = 0; callRing(1); } }
+        else if (!call2Ok) { if (++call2Up >= 60) { call2Up = 0; callRing(2); } }
       }, 1000);
       /* Voice call: on pickup, play Adebiyi's uploaded voice note (voice-call.mp3 at the site root), then hand over to Contact */
       var callVoice = new Audio("voice-call.mp3"); callVoice.preload = "auto";
@@ -2812,6 +2980,8 @@
       $("acWa").addEventListener("click", function (e) { e.preventDefault(); leave("https://wa.me/2347042819602"); });
       function callAnswer() {
         clearTimeout(callT); clearInterval(callTone); callLive = true;
+        if (callStage === 2) { call2Ok = true; store.set("call2Accepted", Date.now()); }
+        else { call1Ok = true; store.set("call1Accepted", Date.now()); call2Up = 0; }
         capsule.show("call", '<span>● On call</span>', function () { callEl.classList.add("is-on"); });
         $("callBtns").hidden = true; $("callLive").hidden = false;
         var secs = 0; $("callSub").textContent = "Connected · 0:00";
