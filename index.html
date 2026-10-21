@@ -2239,11 +2239,11 @@
         aiHist.push({ role: "user", content: v });
         var arr = [{ role: "system", content: AI_SYS }, { role: "system", content: aiNote() }].concat(aiHist.slice(-8));
         var ctl = window.AbortController ? new AbortController() : null;
-        var to = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : 0;
+        var to = ctl ? setTimeout(function () { ctl.abort(); }, 30000) : 0;
         fetch(aiCfg.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + aiCfg.apiKey },
-          body: JSON.stringify({ model: aiCfg.model, messages: arr, max_tokens: 110, temperature: 0.5 }),
+          body: JSON.stringify({ model: aiCfg.model, messages: arr, max_tokens: 500, temperature: 0.5, reasoning_effort: "low" }),
           signal: ctl ? ctl.signal : undefined
         }).then(function (r) { if (!r.ok) throw new Error("ai"); return r.json(); })
           .then(function (j) {
@@ -2886,11 +2886,11 @@
       function xgAiFetch(userText, maxTokens, done) {
         if (!aiCfg || aiDead) return done(null);
         var ctl = window.AbortController ? new AbortController() : null;
-        var to = ctl ? setTimeout(function () { ctl.abort(); }, 12000) : 0;
+        var to = ctl ? setTimeout(function () { ctl.abort(); }, 60000) : 0;
         fetch(aiCfg.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + aiCfg.apiKey },
-          body: JSON.stringify({ model: aiCfg.model, messages: [{ role: "system", content: XG_AI_SYS }, { role: "user", content: userText }], max_tokens: maxTokens, temperature: 0.9 }),
+          body: JSON.stringify({ model: aiCfg.model, messages: [{ role: "system", content: XG_AI_SYS }, { role: "user", content: userText }], max_tokens: maxTokens, temperature: 0.9, reasoning_effort: "low" }),
           signal: ctl ? ctl.signal : undefined
         }).then(function (r) { if (!r.ok) throw new Error("ai"); return r.json(); })
           .then(function (j) {
@@ -2907,7 +2907,7 @@
         if (!st || st.day !== xgDay() || st.src !== "tpl" || st.aiTried || st.sent > 0) return;
         st.aiTried = true; store.set("xgState", st);
         xgAiBusy = true;
-        xgAiFetch(xgAiUserText(p, 5, null), 700, function (posts) {
+        xgAiFetch(xgAiUserText(p, 5, null), 1200, function (posts) {
           xgAiBusy = false;
           if (!posts) return;
           var cur = store.get("xgState");
@@ -2967,7 +2967,7 @@
         var p = xgProfile();
         if (aiCfg && !aiDead && p) {
           xgAiBusy = true;
-          xgAiFetch(xgAiUserText(p, 1, st.posts.slice()), 160, function (posts) {
+          xgAiFetch(xgAiUserText(p, 1, st.posts.slice()), 500, function (posts) {
             xgAiBusy = false;
             var cur = store.get("xgState"); if (!cur) return;
             var add = posts && posts.filter(function (t) { return cur.posts.indexOf(t) < 0; })[0];
